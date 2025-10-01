@@ -1,0 +1,28 @@
+# Node.js backend
+/backend/node_modules
+/backend/.env
+/backend/dist
+/backend/npm-debug.log
+/backend/yarn-error.log
+
+# React frontend
+/frontend/node_modules
+/frontend/.env
+/frontend/build
+/frontend/.cache
+/frontend/npm-debug.log
+/frontend/yarn-error.log
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files (optional)
+.vscode/
+.idea/
+
+# Optional: temporary files
+*.tmp
