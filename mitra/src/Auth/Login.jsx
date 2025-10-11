@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Leaf, Tractor, ShoppingBag, Mail, Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Main Login Component
 const Login = () => {
@@ -132,9 +133,10 @@ const Login = () => {
           
           {/* Footer Links */}
           <div className="mt-6 text-center">
-            <a href="#" className={`text-sm text-gray-500 hover:text-[#bd9476] transition`}>
-              Forgot Password?
-            </a>
+            <Link to="/signup" className={`text-sm text-gray-500 hover:text-[#bd9476] transition`}>
+              Not Signed up yet? Create an account
+            </Link>
+           
           </div>
         </div>
       </div>
