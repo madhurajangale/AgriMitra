@@ -6,6 +6,7 @@ import Login from './Auth/login';
 import Signup from './Auth/Signup';
 import Navbar from './Components/Navbar';
 import Shop from './pages/Shop';
+import ProductDetailsPage from './pages/ProductDetails';
 function AppContent() {
   const location = useLocation();
   const hideNavbar = location.pathname === '/login' || location.pathname === '/signup';
@@ -18,6 +19,7 @@ function AppContent() {
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/shop' element={<Shop />} />
+        <Route path="/product/:id" element={<ProductDetailsPage />} />
       </Routes>
     </>
   );
