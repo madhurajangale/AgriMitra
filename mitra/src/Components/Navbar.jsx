@@ -18,6 +18,7 @@ function Navbar(){
   <Link to="/#home" className={`hover:text-[#bd9476] transition duration-150`}>Home</Link>
   <Link to="/#mission" className={`hover:text-[#bd9476] transition duration-150`}>Our Mission</Link>
   <Link to="/#features" className={`hover:text-[#bd9476] transition duration-150`}>Features</Link>
+  <Link to="/shop" className={`hover:text-[#bd9476] transition duration-150`}>Shop</Link>
   <Link to="/login" className={`hover:text-[#bd9476] transition duration-150`}>Login</Link>
 </nav>
           <button className={`md:hidden p-2 text-gray-700 hover:text-[#bd9476] transition duration-150`}>
