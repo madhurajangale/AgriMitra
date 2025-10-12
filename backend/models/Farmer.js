@@ -20,9 +20,7 @@ const farmerSchema = new mongoose.Schema({
     required: true,
   },
 
-  crops: {
-    type: [String], 
-  },
+
 }, {
   timestamps: true,
 });
