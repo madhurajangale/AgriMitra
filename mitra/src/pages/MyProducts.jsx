@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { FARMER_DATA } from '../../Farmerdata';
 import  CropData from '../../CropData';
 import { Plus, Archive } from 'lucide-react'; // Example icons
 
-export const FARMER_STOCK = [
-    { id: 1, name: 'Tomatoes', category: 'Vegetables', quantity: 50, unit: 'lbs', price: 3.99, deliveryCost: 5.00, image: 'https://images.unsplash.com/photo-1579549303799-fae26b1c5a9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTY5fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.0.3&q=80&w=1080' },
-    { id: 2, name: 'Jowar', category: 'Grains', quantity: 150, unit: 'lbs', price: 2.49, deliveryCost: 7.00, image: 'https://images.unsplash.com/photo-1557800636-8c1056a29f8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTY5fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.0.3&q=80&w=1080' },
-    { id: 3, name: 'Wheat', category: 'Grains', quantity: 75, unit: 'jars', price: 12.00, deliveryCost: 4.50, image: 'https://images.unsplash.com/photo-1627076465492-c2084c8d5789?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTY5fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.0.3&q=80&w=1080' },
-];
+// export const FARMER_STOCK = [
+//     { id: 1, name: 'Tomatoes', category: 'Vegetables', quantity: 50, unit: 'lbs', price: 3.99, deliveryCost: 5.00, image: 'https://images.unsplash.com/photo-1579549303799-fae26b1c5a9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTY5fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.0.3&q=80&w=1080' },
+//     { id: 2, name: 'Jowar', category: 'Grains', quantity: 150, unit: 'lbs', price: 2.49, deliveryCost: 7.00, image: 'https://images.unsplash.com/photo-1557800636-8c1056a29f8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTY5fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.0.3&q=80&w=1080' },
+//     { id: 3, name: 'Wheat', category: 'Grains', quantity: 75, unit: 'jars', price: 12.00, deliveryCost: 4.50, image: 'https://images.unsplash.com/photo-1627076465492-c2084c8d5789?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTY5fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.0.3&q=80&w=1080' },
+// ];
 
 const InputField = ({ label, name, type = 'text', value, onChange, min }) => (
         <div className="w-full">
@@ -29,39 +29,51 @@ const InputField = ({ label, name, type = 'text', value, onChange, min }) => (
     );
 
 // 2.1. Stock List Component
-const StockList = ({ stock, onViewDetails }) => (
-    <div className="space-y-4">
-        {stock.length === 0 ? (
-            <div className="text-center p-12 bg-white rounded-xl shadow-md">
-                <p className="text-xl font-medium text-gray-600">Your stock is currently empty. Start adding products! 🛒</p>
+const StockList = ({ stock = [], onViewDetails }) => (
+  <div className="space-y-4">
+    {stock.length === 0 ? (
+      <div className="text-center p-12 bg-white rounded-xl shadow-md">
+        <p className="text-xl font-medium text-gray-600">
+          Your stock is currently empty. Start adding products! 🛒
+        </p>
+      </div>
+    ) : (
+      stock.map((product) => (
+        <div
+          key={product._id || product.id}
+          onClick={() => onViewDetails(product)}
+          className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-[#fefaf7] cursor-pointer transition duration-200"
+        >
+          {/* Left section - Image + Name */}
+          <div className="flex items-center space-x-4">
+            <img
+              src={product.image || "/placeholder.jpg"}
+              alt={product.name || "Crop"}
+              className="w-12 h-12 object-cover rounded-md border border-gray-100"
+            />
+            <div>
+              <p className="font-bold text-[#3b2f1e] capitalize">
+                {product.name || "Unnamed Crop"}
+              </p>
+             
             </div>
-        ) : (
-            stock.map(product => (
-                <div 
-                    key={product.id}
-                    onClick={() => onViewDetails(product)}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-100 hover:bg-[#fcfaf8] cursor-pointer transition duration-200"
-                >
-                    <div className="flex items-center space-x-4">
-                        <img 
-                            src={product.image || 'https://via.placeholder.com/50'} 
-                            alt={product.name} 
-                            className="w-12 h-12 object-cover rounded-md"
-                        />
-                        <div>
-                            <p className="font-bold text-[#4f3d2a]">{product.name}</p>
-                            <p className="text-sm text-gray-500">{product.category}</p>
-                        </div>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-lg font-semibold text-green-700">{product.quantity} {product.unit}</p>
-                        <p className="text-sm text-gray-600">${product.price.toFixed(2)} / {product.unit}</p>
-                    </div>
-                </div>
-            ))
-        )}
-    </div>
+          </div>
+
+          {/* Right section - Quantity + Price */}
+          <div className="text-right">
+            <p className="text-lg font-semibold text-green-700">
+              {product.quantity || 0} {product.unit || "units"}
+            </p>
+            <p className="text-sm text-gray-600">
+              ₹{(product.market_price || 0).toFixed(2)} / {product.unit || "unit"}
+            </p>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
 );
+
 
 // 2.2. Add Product Form Component
 const AddProductForm = ({ onAddProduct }) => {
@@ -74,6 +86,30 @@ const AddProductForm = ({ onAddProduct }) => {
         deliveryCost: 0.00,
     });
 
+    useEffect(() => {
+        const fetchProducts = async () => {
+            if (!email) return setError("Farmer not logged in.");
+            try {
+                setLoading(true);
+                const response = await fetch(`http://localhost:5000/api/crops?email=${email}`);
+                const data = await response.json();
+                console.log(data)
+                if (response.ok) {
+                    setStockData(data);
+                } else {
+                    setStockData([]);
+                    setError(data.message || "Failed to fetch products.");
+                }
+            } catch (err) {
+                console.error("Error fetching products:", err);
+                setError("Something went wrong while fetching products.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [email]);
     // Update the unit whenever a crop name is selected
     const handleCropChange = (e) => {
         const selectedCrop = CropData.find(crop => crop.name === e.target.value);
@@ -327,20 +363,46 @@ const ProductDetailsView = ({ product, onEdit, onBack }) => {
 const MyProductsPage = () => {
     // 'stock' or 'add'
     const [activeView, setActiveView] = useState('stock'); 
-    const [stockData, setStockData] = useState(FARMER_STOCK); // State for the editable product list
+    const [stockData, setStockData] = useState([]); // State for the editable product list
     const [selectedProduct, setSelectedProduct] = useState(null); // Product selected for details view
+       const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+const email = localStorage.getItem("email");
+    useEffect(() => {
+        const fetchProducts = async () => {
+            if (!email) return setError("Farmer not logged in.");
+            try {
+                setLoading(true);
+                const response = await fetch(`http://localhost:5000/api/crops/get_All?email=${email}`);
+                const data = await response.json();
+                console.log(data)
+                if (response.ok) {
+                    setStockData(data);
+                } else {
+                    setStockData([]);
+                    setError(data.message || "Failed to fetch products.");
+                }
+            } catch (err) {
+                console.error("Error fetching products:", err);
+                setError("Something went wrong while fetching products.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const handleAddProduct = (newProduct) => {
-        setStockData(prevStock => [newProduct, ...prevStock]);
-        setActiveView('stock'); // Switch back to stock list after adding
-    };
+        fetchProducts();
+    }, [email]);
+    // const handleAddProduct = (newProduct) => {
+    //     setStockData(prevStock => [newProduct, ...prevStock]);
+    //     setActiveView('stock'); // Switch back to stock list after adding
+    // };
 
-    const handleEditProduct = (updatedProduct) => {
-        setStockData(prevStock => 
-            prevStock.map(p => p.id === updatedProduct.id ? updatedProduct : p)
-        );
-        setSelectedProduct(updatedProduct); // Update the currently selected product view
-    };
+    // const handleEditProduct = (updatedProduct) => {
+    //     setStockData(prevStock => 
+    //         prevStock.map(p => p.id === updatedProduct.id ? updatedProduct : p)
+    //     );
+    //     setSelectedProduct(updatedProduct); // Update the currently selected product view
+    // };
 
     // If a product is selected, show the details view
     if (selectedProduct) {
@@ -357,7 +419,7 @@ const MyProductsPage = () => {
     
     // Otherwise, show the main dashboard
     return (
-        <div className="min-h-screen bg-[#f7f4f1] font-sans p-4 sm:p-8">
+  <div className="min-h-screen bg-[#f7f4f1] font-sans p-4 sm:p-8">
             <div className="max-w-6xl mx-auto">
                 <header className="text-center mb-8">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-[#4f3d2a] mb-2">
@@ -394,9 +456,8 @@ const MyProductsPage = () => {
                 {activeView === 'stock' ? (
                     <StockList stock={stockData} onViewDetails={setSelectedProduct} />
                 ) : (
-                    <AddProductForm onAddProduct={handleAddProduct} />
+                    <AddProductForm onAddProduct={(newProduct) => setStockData([newProduct, ...stockData])} />
                 )}
-
             </div>
         </div>
     );
