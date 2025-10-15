@@ -9,7 +9,7 @@ import Shop from './pages/Shop';
 import ProductDetailsPage from './pages/ProductDetails';
 import FarmNavbar from './Components/FarmNavbar';
 import MyProducts from './pages/MyProducts';
-import Backup from './pages/backup';
+
 function AppContent() {
   const location = useLocation();
   const hideNavbar = location.pathname === '/login' || location.pathname === '/signup';
