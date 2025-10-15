@@ -36,7 +36,8 @@ const Login = () => {
         setMessage("Login successful! Redirecting...");
         // Save user info if needed
         localStorage.setItem("user", JSON.stringify(data));
-
+        localStorage.setItem("email", email);
+        localStorage.setItem("role", userType);
         setTimeout(() => {
           // Redirect to home or dashboard
           navigate("/");

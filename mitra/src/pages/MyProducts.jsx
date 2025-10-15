@@ -65,6 +65,7 @@ const StockList = ({ stock, onViewDetails }) => (
 
 // 2.2. Add Product Form Component
 const AddProductForm = ({ onAddProduct }) => {
+    const email = localStorage.getItem("email");
     const [formData, setFormData] = useState({
         name: 'Select Crop',
         quantity: 1,
@@ -91,26 +92,75 @@ const AddProductForm = ({ onAddProduct }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (formData.name === 'Select Crop' || formData.quantity <= 0 || formData.price <= 0) {
-            alert('Please fill out all fields with valid values.');
-            return;
-        }
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     if (formData.name === 'Select Crop' || formData.quantity <= 0 || formData.price <= 0) {
+    //         alert('Please fill out all fields with valid values.');
+    //         return;
+    //     }
         
-        // Simulating the addition logic
-        const newProduct = {
-            ...formData,
-            id: Date.now(), // Unique ID
-            // In a real app, you would fetch the image and category based on the name
-            image: 'https://via.placeholder.com/150?text=New+Crop', 
-            category: CropData.find(c => c.name === formData.name)?.category || 'Unknown',
-        };
-        onAddProduct(newProduct);
-        alert(`${newProduct.name} added to stock!`);
-    };
+    //     // Simulating the addition logic
+    //     const newProduct = {
+    //         ...formData,
+    //         id: Date.now(), // Unique ID
+    //         // In a real app, you would fetch the image and category based on the name
+    //         image: 'https://via.placeholder.com/150?text=New+Crop', 
+    //         category: CropData.find(c => c.name === formData.name)?.category || 'Unknown',
+    //     };
+    //     onAddProduct(newProduct);
+    //     alert(`${newProduct.name} added to stock!`);
+    // };
 
-    
+    const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (formData.name === 'Select Crop' || formData.quantity <= 0 || formData.price <= 0) {
+    alert('Please fill out all fields with valid values.');
+    return;
+  }
+
+  const email = localStorage.getItem("email"); // 👈 get farmer’s email
+  if (!email) {
+    alert("Farmer email not found. Please login again.");
+    return;
+  }
+
+  const newProduct = {
+    name: formData.name,
+    farmer: email, // 👈 attach farmer email here
+    quantity: formData.quantity,
+    unit: formData.unit,
+    market_price: formData.price,
+    delivery_charge: formData.deliveryCost,
+  };
+
+  try {
+    const response = await fetch("http://localhost:5000/api/crops/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newProduct),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert(`${data.crop.name} added successfully!`);
+      onAddProduct({
+        ...formData,
+        id: Date.now(),
+        farmer: email,
+        image: 'https://via.placeholder.com/150?text=New+Crop',
+        category: CropData.find(c => c.name === formData.name)?.category || 'Unknown',
+      });
+    } else {
+      alert(data.message || "Failed to add crop. Try again.");
+    }
+  } catch (err) {
+    console.error("Error adding crop:", err);
+    alert("Something went wrong while adding the crop.");
+  }
+};
+
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg border border-[#efebe7] max-w-2xl mx-auto">

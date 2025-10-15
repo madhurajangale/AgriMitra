@@ -1,43 +1,74 @@
-import React, { useState, useMemo } from 'react';
-// Import mock data you've created
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import CropData from '../../CropData';
-import { FARMER_DATA, DELIVERY_LOCATIONS, PRODUCT_DESCRIPTIONS } from '../../Farmerdata'; 
-
+import { DELIVERY_LOCATIONS, PRODUCT_DESCRIPTIONS } from '../../Farmerdata';
 
 const ProductDetailsPage = () => {
-    // State for user interactions
-     const { id } = useParams();
-    const product = CropData.find(p => p.id === Number(id));
+  const { id } = useParams();
+  const product = CropData.find(p => p.id === Number(id));
 
-    const [selectedLocation, setSelectedLocation] = useState('Select Location');
-    const [selectedFarmerId, setSelectedFarmerId] = useState(null);
-    const [quantity, setQuantity] = useState(1);
+  const [selectedLocation, setSelectedLocation] = useState('Select Location');
+  const [farmers, setFarmers] = useState([]);
+  const [selectedFarmerId, setSelectedFarmerId] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    // Get the product description from the mock data
-    const description = PRODUCT_DESCRIPTIONS[product.name] || "A truly fresh product from our fields, full of natural goodness.";
- if (!product) {
-        return <div className="text-center text-red-500 text-xl mt-10">Product not found.</div>;
-    }
-    // Filter farmers based on the selected location
-    const availableFarmers = useMemo(() => {
-        if (selectedLocation === 'Select Location') return [];
-        return FARMER_DATA.filter(farmer => farmer.location === selectedLocation);
-    }, [selectedLocation]);
+  if (!product) {
+    return <div className="text-center text-red-500 text-xl mt-10">Product not found.</div>;
+  }
 
-    // Calculate total cost for display
-    const selectedFarmer = FARMER_DATA.find(f => f.id === selectedFarmerId);
-    const subtotal = product.price * quantity;
-    const delivery = selectedFarmer ? selectedFarmer.deliveryCost : 0;
-    const total = subtotal + delivery;
+  const description = PRODUCT_DESCRIPTIONS[product.name] || "A truly fresh product from our fields, full of natural goodness.";
 
-    const handleAddToCart = () => {
-        if (!selectedFarmerId) {
-            alert("Please select a delivery location and a farmer first!");
-            return;
+  // 🔹 Fetch farmers from backend whenever location changes
+  useEffect(() => {
+    console.log("first")
+    const fetchFarmers = async () => {
+      if (selectedLocation === 'Select Location') {
+        setFarmers([]);
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+      try {
+        console.log("second")
+        const response = await fetch(
+          `http://localhost:5000/api/farmer/get_all?location=${selectedLocation}&name=${product.name}`
+        );
+
+        const data = await response.json();
+        console.log(data)
+        if (response.ok) {
+          setFarmers(data);
+        } else {
+          setFarmers([]);
+          setError(data.message || "No farmers found.");
         }
-        alert(`Added ${quantity} units of ${product.name} (from ${selectedFarmer.name}) to cart! Total cost: $${total.toFixed(2)}`);
+      } catch (err) {
+        console.error("Error fetching farmers:", err);
+        setError("Failed to fetch farmers. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchFarmers();
+  }, [selectedLocation, product.name]);
+
+const selectedFarmer = farmers.find(f => f._id === selectedFarmerId);
+
+  const subtotal = product.price * quantity;
+  const delivery = selectedFarmer ? selectedFarmer.delivery_charge : 0;
+  const total = subtotal + delivery;
+
+  const handleAddToCart = () => {
+    if (!selectedFarmerId) {
+      alert("Please select a delivery location and a farmer first!");
+      return;
+    }
+    alert(`Added ${quantity} units of ${product.name} (from ${selectedFarmer.name}) to cart! Total cost: ₹${total.toFixed(2)}`);
+  };
 
     return (
         <div className="min-h-screen bg-[#f7f4f1] font-sans p-4 sm:p-8">
@@ -111,27 +142,25 @@ const ProductDetailsPage = () => {
                                     <h3 className="text-lg font-medium text-gray-700 mb-3">
                                         2. Choose a Farmer in {selectedLocation}
                                     </h3>
-                                    {availableFarmers.length > 0 ? (
+                                    {farmers.length > 0 ? (
                                         <div className="space-y-3">
-                                            {availableFarmers.map(farmer => (
+                                            {farmers.map(farmer => (
                                                 <div 
-                                                    key={farmer.id}
-                                                    onClick={() => setSelectedFarmerId(farmer.id)}
-                                                    className={`
-                                                        p-4 border rounded-lg cursor-pointer transition duration-200
-                                                        ${selectedFarmerId === farmer.id 
+                                                    key={farmer._id}
+                                                    onClick={() => setSelectedFarmerId(farmer._id)}  // use _id
+                                                    className={`p-4 border rounded-lg cursor-pointer transition duration-200
+                                                        ${selectedFarmerId === farmer._id 
                                                             ? 'border-4 border-[#bd9476] bg-[#fdf5ed] shadow-inner' 
                                                             : 'border-gray-200 hover:bg-gray-50'
-                                                        }
-                                                    `}
+                                                        }`}
                                                 >
-                                                    <p className="font-bold text-[#4f3d2a]">{farmer.name}</p>
-                                                    <p className="text-sm text-gray-600">Location: {farmer.location}</p>
+                                                    <p className="font-bold text-[#4f3d2a]">Farmer: {farmer.farmerName}</p>
                                                     <p className="text-sm font-semibold text-green-700">
-                                                        Delivery: ${farmer.deliveryCost.toFixed(2)} ({farmer.estimatedDelivery})
+                                                        Delivery: ₹{farmer.delivery_charge.toFixed(2)}
                                                     </p>
                                                 </div>
                                             ))}
+
                                         </div>
                                     ) : (
                                         <p className="text-sm text-red-500">No farmers found delivering to {selectedLocation}.</p>

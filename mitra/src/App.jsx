@@ -9,13 +9,21 @@ import Shop from './pages/Shop';
 import ProductDetailsPage from './pages/ProductDetails';
 import FarmNavbar from './Components/FarmNavbar';
 import MyProducts from './pages/MyProducts';
+import Backup from './pages/backup';
 function AppContent() {
   const location = useLocation();
   const hideNavbar = location.pathname === '/login' || location.pathname === '/signup';
-
+const email = localStorage.getItem("email");
+const role = localStorage.getItem("role");
+console.log(email);
+console.log(role)
   return (
     <>
-      {!hideNavbar && <Navbar />}
+      {!hideNavbar && (
+        <>
+          {role === "farmer" ? <FarmNavbar /> : <Navbar />}
+        </>
+      )}
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
@@ -23,6 +31,7 @@ function AppContent() {
         <Route path='/shop' element={<Shop />} />
         <Route path='/farmproducts' element={<MyProducts />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
+        <Route path='/backup' element={<Backup />} />
       </Routes>
     </>
   );
