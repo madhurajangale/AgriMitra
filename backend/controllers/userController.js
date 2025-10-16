@@ -21,6 +21,7 @@ export const registerUser = async (req, res) => {
 
 
 export const getUser = async (req, res) => {
+  console.log("***")
   try {
     const { email } = req.body; 
 
