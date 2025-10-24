@@ -58,9 +58,12 @@ const ProductDetailsPage = () => {
 
 const selectedFarmer = farmers.find(f => f._id === selectedFarmerId);
 
-  const subtotal = product.price * quantity;
-  const delivery = selectedFarmer ? selectedFarmer.delivery_charge : 0;
-  const total = subtotal + delivery;
+const marketPrice = selectedFarmer ? selectedFarmer.market_price : 0;
+const deliveryCharge = selectedFarmer ? selectedFarmer.delivery_charge : 0;
+
+// Total = (market price + delivery) * quantity
+const total = (marketPrice + deliveryCharge) * quantity;
+
 
   const handleAddToCart = () => {
     if (!selectedFarmerId) {
@@ -97,9 +100,7 @@ const selectedFarmer = farmers.find(f => f._id === selectedFarmerId);
                             </div>
                             
                             <h1 className="text-3xl font-bold text-[#4f3d2a] mb-2">{product.name}</h1>
-                            <p className="text-xl font-extrabold text-green-700 mb-4">
-                                ${product.price.toFixed(2)} <span className="text-lg font-normal text-gray-500">/{product.unit}</span>
-                            </p>
+                           
                             
                             {/* Product Description */}
                             <div className="mt-6 border-t pt-4">
@@ -155,6 +156,9 @@ const selectedFarmer = farmers.find(f => f._id === selectedFarmerId);
                                                         }`}
                                                 >
                                                     <p className="font-bold text-[#4f3d2a]">Farmer: {farmer.farmerName}</p>
+                                                     <p className="text-sm font-semibold text-green-700">
+                                                        Price:  ₹{farmer.market_price.toFixed(2)}
+                                                    </p>
                                                     <p className="text-sm font-semibold text-green-700">
                                                         Delivery: ₹{farmer.delivery_charge.toFixed(2)}
                                                     </p>
@@ -188,21 +192,39 @@ const selectedFarmer = farmers.find(f => f._id === selectedFarmerId);
                                         />
                                     </div>
 
-                                    {/* Total Summary */}
-                                    <div className="space-y-2 py-4 border-t border-b mb-6">
-                                        <div className="flex justify-between text-gray-600">
-                                            <span>Subtotal ({quantity} x ${product.price.toFixed(2)}):</span>
-                                            <span>${subtotal.toFixed(2)}</span>
-                                        </div>
-                                        <div className="flex justify-between text-gray-600">
-                                            <span>Delivery Cost (from {selectedFarmer.name}):</span>
-                                            <span>${delivery.toFixed(2)}</span>
-                                        </div>
-                                        <div className="flex justify-between text-xl font-bold text-[#4f3d2a]">
-                                            <span>Total (incl. Delivery):</span>
-                                            <span>${total.toFixed(2)}</span>
-                                        </div>
-                                    </div>
+<div className="space-y-2 py-4 border-t border-b mb-6">
+  {/* Market Price */}
+  <div className="flex justify-between text-gray-600">
+    <span>Market Price:</span>
+    <span>₹{selectedFarmer?.market_price.toFixed(2) || "0.00"}</span>
+  </div>
+
+  {/* Delivery Charge */}
+  <div className="flex justify-between text-gray-600">
+    <span>Delivery Charge:</span>
+    <span>₹{selectedFarmer?.delivery_charge.toFixed(2) || "0.00"}</span>
+  </div>
+
+  {/* Subtotal per unit */}
+  <div className="flex justify-between text-gray-600">
+    <span>Price per unit (Market + Delivery):</span>
+    <span>₹{(selectedFarmer ? selectedFarmer.market_price + selectedFarmer.delivery_charge : 0).toFixed(2)}</span>
+  </div>
+
+  {/* Quantity */}
+  <div className="flex justify-between text-gray-600">
+    <span>Quantity:</span>
+    <span>{quantity}</span>
+  </div>
+
+  {/* Total */}
+  <div className="flex justify-between text-xl font-bold text-[#4f3d2a]">
+    <span>Total (Market + Delivery × Quantity):</span>
+    <span>₹{((selectedFarmer ? selectedFarmer.market_price + selectedFarmer.delivery_charge : 0) * quantity).toFixed(2)}</span>
+  </div>
+</div>
+
+
                                     
                                     {/* Add to Cart Button */}
                                     <button

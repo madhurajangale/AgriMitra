@@ -31,7 +31,7 @@ console.log(role)
         <Route path='/shop' element={<Shop />} />
         <Route path='/farmproducts' element={<MyProducts />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
-        
+      
       </Routes>
     </>
   );
