@@ -11,9 +11,9 @@ const CropData = [
   { id: 7, name: 'Barley', category: 'Grains', price: 1.00, unit: 'per kg', image: 'https://cdn.viva.org.uk/wp-content/uploads/2024/10/Barley.webp' },
 
   // 🌿 VEGETABLES
-  { id: 8, name: 'Tomatoes', category: 'Vegetables', price: 2.30, unit: 'per kg', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJE1nmUxtL9Pro_mAqQD4l-UKsbJjqSPapDg&s' },
-  { id: 9, name: 'Potatoes', category: 'Vegetables', price: 1.25, unit: 'per kg', image: 'https://img.lb.wbmdstatic.com/vim/live/webmd/consumer_assets/site_images/articles/health_tools/healthy_food_mistakes_slideshow/1800ss_thinkstock_rf_wooden_bowl_potatoes_on_table.jpg?resize=750px:*&output-quality=75' },
-  { id: 10, name: 'Onions', category: 'Vegetables', price: 1.60, unit: 'per kg', image: 'https://vegipath.in/wp-content/uploads/2025/02/Main-onion1.jpg' },
+  { id: 8, name: 'Tomato', category: 'Vegetables', price: 2.30, unit: 'per kg', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJE1nmUxtL9Pro_mAqQD4l-UKsbJjqSPapDg&s' },
+  { id: 9, name: 'Potato', category: 'Vegetables', price: 1.25, unit: 'per kg', image: 'https://img.lb.wbmdstatic.com/vim/live/webmd/consumer_assets/site_images/articles/health_tools/healthy_food_mistakes_slideshow/1800ss_thinkstock_rf_wooden_bowl_potatoes_on_table.jpg?resize=750px:*&output-quality=75' },
+  { id: 10, name: 'Onion', category: 'Vegetables', price: 1.60, unit: 'per kg', image: 'https://vegipath.in/wp-content/uploads/2025/02/Main-onion1.jpg' },
   { id: 11, name: 'Cauliflower', category: 'Vegetables', price: 2.75, unit: 'per piece', image: 'https://thriftylesley.com/wp-content/uploads/2013/09/cauliflower.jpg' },
   { id: 12, name: 'Brinjal (Eggplant)', category: 'Vegetables', price: 2.20, unit: 'per kg', image: 'https://images.unsplash.com/photo-1560130839-1b39a4c0b8a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
   { id: 13, name: 'Okra (Lady Finger)', category: 'Vegetables', price: 2.49, unit: 'per kg', image: 'https://images.unsplash.com/photo-1623236772760-3b49c3622cfb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
