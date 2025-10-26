@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Leaf, Tractor, ShoppingBag, Mail, Lock, User, MapPin, Crop } from 'lucide-react';
+import { Leaf, Tractor, ShoppingBag, Mail, Truck, Lock, User, MapPin, Crop } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 /* ✅ Move InputField OUTSIDE the Signup component */
@@ -102,34 +102,48 @@ const Signup = () => {
         </div>
 
         <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-[#efebe7]">
-          <div className="flex space-x-4 mb-8 bg-gray-100 p-1 rounded-xl">
+          <div className="flex space-x-2 mb-8 bg-gray-100 p-1 rounded-xl">
             <button
-              type="button"
-              onClick={() => setUserType('farmer')}
-              className={`${baseButtonClass} ${
-                isFarmer
-                  ? `bg-[#bd9476] text-white`
-                  : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
-              }`}
-            >
-              <Tractor className="w-5 h-5 inline mr-2" /> Farmer Signup
-            </button>
-            <button
-              type="button"
-              onClick={() => setUserType('customer')}
-              className={`${baseButtonClass} ${
-                !isFarmer
-                  ? `bg-[#bd9476] text-white`
-                  : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
-              }`}
-            >
-              <ShoppingBag className="w-5 h-5 inline mr-2" /> Customer Signup
-            </button>
+            type="button"
+            onClick={() => setUserType("farmer")}
+            className={`${baseButtonClass} text-xs ${
+              userType === "farmer"
+                ? `bg-[#bd9476] text-white`
+                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
+            }`}
+          >
+            <Tractor className="w-3 h-3 inline mr-1" /> Farmer Login
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setUserType("customer")}
+            className={`${baseButtonClass} text-xs ${
+              userType === "customer"
+                ? `bg-[#bd9476] text-white`
+                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
+            }`}
+          >
+            <ShoppingBag className="w-3 h-3 inline mr-1" /> Customer Login
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setUserType("driver")}
+            className={`${baseButtonClass} text-xs ${
+              userType === "driver"
+                ? `bg-[#bd9476] text-white`
+                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
+            }`}
+          >
+            <Truck className="w-3 h-3 inline mr-1" /> Driver Login
+          </button>
           </div>
 
-          <h2 className="text-xl font-bold mb-6 text-center text-[#4f3d2a]">
-            Register as {isFarmer ? 'Farmer' : 'Customer'}
+           <h2 className="text-xl font-bold mb-6 text-center text-[#4f3d2a]">
+            Sign in as {userType === "farmer" ? "Farmer" : userType === "driver" ? "Driver" : "Customer"}
           </h2>
+
 
           <form onSubmit={handleSignup}>
             <InputField

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Leaf, Tractor, ShoppingBag, Mail, Lock } from "lucide-react";
+import { Leaf, Tractor, ShoppingBag, Truck, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -55,7 +55,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#f7f4f1] font-sans">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md mx-auto">
         {/* Logo/Header */}
         <div className="text-center mb-8">
           <Leaf className="w-10 h-10 mx-auto text-[#bd9476]" />
@@ -68,35 +68,48 @@ const Login = () => {
         </div>
 
         {/* Login Card */}
-        <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-[#efebe7]">
+        <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-[#efebe7] w-full">
           {/* Role Selector */}
-          <div className="flex space-x-4 mb-8 bg-gray-100 p-1 rounded-xl">
+          <div className="flex space-x-2 mb-8 bg-gray-100 p-1 rounded-xl">
             <button
-              type="button"
-              onClick={() => setUserType("farmer")}
-              className={`${baseButtonClass} ${
-                isFarmer
-                  ? `bg-[#bd9476] text-white`
-                  : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
-              }`}
-            >
-              <Tractor className="w-5 h-5 inline mr-2" /> Farmer Login
-            </button>
-            <button
-              type="button"
-              onClick={() => setUserType("customer")}
-              className={`${baseButtonClass} ${
-                !isFarmer
-                  ? `bg-[#bd9476] text-white`
-                  : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
-              }`}
-            >
-              <ShoppingBag className="w-5 h-5 inline mr-2" /> Customer Login
-            </button>
+            type="button"
+            onClick={() => setUserType("farmer")}
+            className={`${baseButtonClass} text-xs ${
+              userType === "farmer"
+                ? `bg-[#bd9476] text-white`
+                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
+            }`}
+          >
+            <Tractor className="w-3 h-3 inline mr-1" /> Farmer Login
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setUserType("customer")}
+            className={`${baseButtonClass} text-xs ${
+              userType === "customer"
+                ? `bg-[#bd9476] text-white`
+                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
+            }`}
+          >
+            <ShoppingBag className="w-3 h-3 inline mr-1" /> Customer Login
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setUserType("driver")}
+            className={`${baseButtonClass} text-xs ${
+              userType === "driver"
+                ? `bg-[#bd9476] text-white`
+                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
+            }`}
+          >
+            <Truck className="w-3 h-3 inline mr-1" /> Driver Login
+          </button>
           </div>
 
-          <h2 className="text-xl font-bold mb-6 text-center text-[#4f3d2a]">
-            Sign in as {isFarmer ? "Farmer" : "Customer"}
+           <h2 className="text-xl font-bold mb-6 text-center text-[#4f3d2a]">
+            Sign in as {userType === "farmer" ? "Farmer" : userType === "driver" ? "Driver" : "Customer"}
           </h2>
 
           <form onSubmit={handleLogin}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Login from '../Auth/login';
+import Login from '../Auth/Login';
 import { Leaf, Handshake, ShoppingCart, TrendingUp, Users, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom'; 
 // Main Home Component

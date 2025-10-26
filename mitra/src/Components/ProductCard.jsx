@@ -24,12 +24,12 @@ const ProductCard = ({ product }) => {
                     <div className="flex justify-between items-center mb-4 border-t pt-3">
                       <div>
                         <div className="text-2xl font-extrabold text-green-700">
-                          ${product.price.toFixed(2)}
+                          Rs.{product.price}
                           <span className="text-base font-normal text-gray-500">/{product.unit}</span>
                         </div>
                         {product.predictedPrice !== undefined && product.predictedPrice !== product.price && (
                           <div className="text-sm text-gray-500 line-through">
-                            Original: ${product.originalPrice.toFixed(2)}
+                            Original: Rs.{product.originalPrice.toFixed(2)}
                           </div>
                         )}
                       </div>
