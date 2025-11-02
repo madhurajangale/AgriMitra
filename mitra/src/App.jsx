@@ -12,7 +12,7 @@ import MyProducts from './pages/MyProducts';
 import Driver from './pages/Driver';
 import DriverNav from './Components/DriverNav';
 import Chat from './Components/Chat';
-
+import Maps from './pages/map';
 function AppContent() {
   const location = useLocation();
   const hideNavbar = location.pathname === '/login' || location.pathname === '/signup';
@@ -41,7 +41,8 @@ console.log(role)
         <Route path='/farmproducts' element={<MyProducts />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
        <Route path='/driver' element={<Driver />} /> 
-       <Route path='/chat' element={<Chat />} />       
+       <Route path='/chat' element={<Chat />} /> 
+       <Route path='/map' element={<Maps />} />      
       </Routes>
     </>
   );

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Leaf, Tractor, ShoppingBag, Mail, Truck, Lock, User, MapPin, Crop } from 'lucide-react';
+import { Leaf, Tractor, ShoppingBag, Mail, Truck, Lock, User, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-/* ✅ Move InputField OUTSIDE the Signup component */
+/* Generic InputField */
 const InputField = ({
   label,
   id,
@@ -18,7 +18,7 @@ const InputField = ({
       {label}
     </label>
     <div className="relative">
-      <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+      {Icon && <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />}
       <input
         type={type}
         id={id}
@@ -33,35 +33,56 @@ const InputField = ({
 );
 
 const Signup = () => {
-  const [userType, setUserType] = useState('customer');
+  const [userType, setUserType] = useState('customer'); // 'farmer' | 'customer' | 'driver'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [location, setLocation] = useState('');
-  const [crops, setCrops] = useState('');
+  const [location, setLocation] = useState(''); // farmer
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // driver-specific
+  const [address, setAddress] = useState('');
+  const [plates, setPlates] = useState(['']); // vehiclePlateNumbers
+
   const isFarmer = userType === 'farmer';
+  const isDriver = userType === 'driver';
   const baseButtonClass =
     'flex-1 p-3 text-center text-sm font-semibold rounded-lg transition duration-200 shadow-md';
+
+  const updatePlate = (index, value) => {
+    setPlates((prev) => {
+      const copy = prev.slice();
+      copy[index] = value;
+      return copy;
+    });
+  };
+  const addPlate = () => setPlates((p) => [...p, '']);
+  const removePlate = (index) => setPlates((p) => p.filter((_, i) => i !== index));
+  const numberOfVehicles = plates.filter((p) => p && p.trim()).length;
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setMessage('');
+    if (!name.trim() || !email.trim() || !password) {
+      setMessage('Please fill required fields: name, email, password.');
+      return;
+    }
+
     setLoading(true);
 
     const userData = {
-      name,
-      email,
+      name: name.trim(),
+      email: email.trim(),
       password,
       role: userType,
       ...(isFarmer && {
-        location,
-        crops: crops
-          .split(',')
-          .map((c) => c.trim())
-          .filter((c) => c.length > 0),
+        location: location.trim(),
+      }),
+      ...(isDriver && {
+        address: address.trim(),
+        numberOfVehicles,
+        vehiclePlateNumbers: plates.filter(Boolean).map((p) => p.trim()),
       }),
     };
 
@@ -73,14 +94,15 @@ const Signup = () => {
       });
 
       const data = await response.json();
-      console.log(data)
       if (response.ok) {
         setMessage('Registration successful! You can now log in.');
+        // reset fields
         setName('');
         setEmail('');
         setPassword('');
         setLocation('');
-        
+        setAddress('');
+        setPlates(['']);
       } else {
         setMessage(data.message || 'Registration failed. Please try again.');
       }
@@ -104,86 +126,89 @@ const Signup = () => {
         <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl border border-[#efebe7]">
           <div className="flex space-x-2 mb-8 bg-gray-100 p-1 rounded-xl">
             <button
-            type="button"
-            onClick={() => setUserType("farmer")}
-            className={`${baseButtonClass} text-xs ${
-              userType === "farmer"
-                ? `bg-[#bd9476] text-white`
-                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
-            }`}
-          >
-            <Tractor className="w-3 h-3 inline mr-1" /> Farmer Login
-          </button>
+              type="button"
+              onClick={() => setUserType('farmer')}
+              className={`${baseButtonClass} text-xs ${
+                userType === 'farmer' ? 'bg-[#bd9476] text-white' : 'bg-transparent text-gray-600 hover:bg-[#efebe7]'
+              }`}
+            >
+              <Tractor className="w-3 h-3 inline mr-1" /> Farmer
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setUserType("customer")}
-            className={`${baseButtonClass} text-xs ${
-              userType === "customer"
-                ? `bg-[#bd9476] text-white`
-                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
-            }`}
-          >
-            <ShoppingBag className="w-3 h-3 inline mr-1" /> Customer Login
-          </button>
+            <button
+              type="button"
+              onClick={() => setUserType('customer')}
+              className={`${baseButtonClass} text-xs ${
+                userType === 'customer' ? 'bg-[#bd9476] text-white' : 'bg-transparent text-gray-600 hover:bg-[#efebe7]'
+              }`}
+            >
+              <ShoppingBag className="w-3 h-3 inline mr-1" /> Customer
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setUserType("driver")}
-            className={`${baseButtonClass} text-xs ${
-              userType === "driver"
-                ? `bg-[#bd9476] text-white`
-                : `bg-transparent text-gray-600 hover:bg-[#efebe7]`
-            }`}
-          >
-            <Truck className="w-3 h-3 inline mr-1" /> Driver Login
-          </button>
+            <button
+              type="button"
+              onClick={() => setUserType('driver')}
+              className={`${baseButtonClass} text-xs ${
+                userType === 'driver' ? 'bg-[#bd9476] text-white' : 'bg-transparent text-gray-600 hover:bg-[#efebe7]'
+              }`}
+            >
+              <Truck className="w-3 h-3 inline mr-1" /> Driver
+            </button>
           </div>
 
-           <h2 className="text-xl font-bold mb-6 text-center text-[#4f3d2a]">
-            Sign in as {userType === "farmer" ? "Farmer" : userType === "driver" ? "Driver" : "Customer"}
+          <h2 className="text-xl font-bold mb-6 text-center text-[#4f3d2a]">
+            Sign up as {isFarmer ? 'Farmer' : isDriver ? 'Driver' : 'Customer'}
           </h2>
 
-
           <form onSubmit={handleSignup}>
-            <InputField
-              label="Full Name"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              Icon={User}
-            />
-            <InputField
-              label="Email Address"
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              Icon={Mail}
-            />
-            <InputField
-              label="Password"
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="********"
-              Icon={Lock}
-            />
+            <InputField label="Full Name" id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" Icon={User} />
+            <InputField label="Email Address" id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" Icon={Mail} />
+            <InputField label="Password" id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" Icon={Lock} />
 
             {isFarmer && (
+              <InputField
+                label="Farm Location (City/Region)"
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g., Maharashtra"
+                Icon={MapPin}
+                required={false}
+              />
+            )}
+
+            {isDriver && (
               <>
                 <InputField
-                  label="Farm Location (City/Region)"
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g., California, USA"
+                  label="Address"
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Driver address"
                   Icon={MapPin}
+                  required={false}
                 />
-                
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Plate Numbers</label>
+                  <div className="space-y-2">
+                    {plates.map((plate, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <input
+                          value={plate}
+                          onChange={(e) => updatePlate(idx, e.target.value)}
+                          placeholder="e.g., MH12AB1234"
+                          className="flex-1 p-3 border border-gray-300 rounded-lg"
+                        />
+                        <button type="button" onClick={() => removePlate(idx)} className="px-3 py-2 bg-red-50 text-red-600 rounded-lg">Remove</button>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between mt-2">
+                      <button type="button" onClick={addPlate} className="px-4 py-2 bg-[#bd9476] text-white rounded-lg">Add Vehicle</button>
+                      <div className="text-sm text-gray-600">Vehicles: {numberOfVehicles}</div>
+                    </div>
+                  </div>
+                </div>
               </>
             )}
 
@@ -207,10 +232,7 @@ const Signup = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
               Already have an account?
-              <Link
-                to="/login"
-                className="font-semibold ml-1 text-[#4f3d2a] hover:text-[#bd9476] transition"
-              >
+              <Link to="/login" className="font-semibold ml-1 text-[#4f3d2a] hover:text-[#bd9476] transition">
                 Log in here
               </Link>
             </p>

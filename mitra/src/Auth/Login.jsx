@@ -38,10 +38,11 @@ const Login = () => {
         localStorage.setItem("user", JSON.stringify(data));
         localStorage.setItem("email", email);
         localStorage.setItem("role", userType);
-        setTimeout(() => {
-          // Redirect to home or dashboard
-          navigate("/");
-        }, 1500);
+        if (userType === "driver") {
+          navigate("/driver"); // open Driver page for drivers
+        } else {
+          navigate("/"); // default home/dashboard for other roles
+        }
       } else {
         setMessage(data.message || "Invalid credentials. Please try again.");
       }
