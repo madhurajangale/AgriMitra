@@ -16,8 +16,8 @@ function Navbar(){
           </div>
           <nav className="hidden md:flex space-x-6 text-gray-600 font-medium">
   <Link to="/#home" className={`hover:text-[#bd9476] transition duration-150`}>Home</Link>
-  <Link to="/#mission" className={`hover:text-[#bd9476] transition duration-150`}>Our Mission</Link>
-  <Link to="/#features" className={`hover:text-[#bd9476] transition duration-150`}>Features</Link>
+  <Link to="/chat" className={`hover:text-[#bd9476] transition duration-150`}>Community Chat</Link>
+  
   <Link to="/farmproducts" className={`hover:text-[#bd9476] transition duration-150`}>MyProducts</Link>
   <Link to="/shop" className={`hover:text-[#bd9476] transition duration-150`}>Orders</Link>
   <Link to="/login" className={`hover:text-[#bd9476] transition duration-150`}>Login</Link>
