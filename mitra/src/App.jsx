@@ -11,6 +11,7 @@ import FarmNavbar from './Components/FarmNavbar';
 import MyProducts from './pages/MyProducts';
 import Driver from './pages/Driver';
 import DriverNav from './Components/DriverNav';
+import Chat from './Components/Chat';
 
 function AppContent() {
   const location = useLocation();
@@ -39,7 +40,8 @@ console.log(role)
         <Route path='/shop' element={<Shop />} />
         <Route path='/farmproducts' element={<MyProducts />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
-       <Route path='/driver' element={<Driver />} />        
+       <Route path='/driver' element={<Driver />} /> 
+       <Route path='/chat' element={<Chat />} />       
       </Routes>
     </>
   );
