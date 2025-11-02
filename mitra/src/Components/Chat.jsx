@@ -3,7 +3,7 @@ import DriverSelection from "../Components/DriverSelection";
 import DriverDetailsView from "../Components/DriverDetailsView";
 import BookingFormView from "../Components/BookingFormView";
 import BookingSuccess from "../Components/BookingSuccess";
-import { fetchDrivers, fetchDriverRides, placeDeliveryOrder } from "../api/deliveryApi";
+import { fetchDrivers, fetchDriverRides } from "../api/deliveryApi";
 
 const Chat = () => {
   const [drivers, setDrivers] = useState([]);
@@ -27,14 +27,12 @@ const Chat = () => {
   const handleSelectDriver = async (driver) => {
     setSelectedDriver(driver);
     setIsLoadingRides(true);
-    const data = await fetchDriverRides(driver.id);
+    const data = await fetchDriverRides(driver.email); // ✅ use email
     setRides(data);
     setIsLoadingRides(false);
   };
 
-  const handleSelectRide = (ride) => {
-    setSelectedRide(ride);
-  };
+  const handleSelectRide = (ride) => setSelectedRide(ride);
 
   const handleBookRide = async (details) => {
     setIsPlacingOrder(true);
@@ -49,7 +47,10 @@ const Chat = () => {
     setSelectedDriver(null);
   };
 
-  if (bookingSuccess) return <BookingSuccess onBackToHome={handleBackToHome} />;
+  // ✅ success screen
+  if (bookingSuccess)
+    return <BookingSuccess onBackToHome={handleBackToHome} />;
+
   if (selectedRide)
     return (
       <BookingFormView
@@ -58,6 +59,7 @@ const Chat = () => {
         isPlacingOrder={isPlacingOrder}
       />
     );
+
   if (selectedDriver)
     return (
       <DriverDetailsView
@@ -67,7 +69,14 @@ const Chat = () => {
         onSelectRide={handleSelectRide}
       />
     );
-  return <DriverSelection drivers={drivers} isLoading={isLoading} onSelectDriver={handleSelectDriver} />;
+
+  return (
+    <DriverSelection
+      drivers={drivers}
+      isLoading={isLoading}
+      onSelectDriver={handleSelectDriver}
+    />
+  );
 };
 
 export default Chat;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import ReactDOM from 'react-dom/client';
 import CreateRideForm from "../Components/CreateRideForm";
 import { 
@@ -30,9 +30,37 @@ const Driver = () => {
     { title: "Earnings (This Month)", value: "₹45,200", icon: TrendingUp, color: "text-[#bd9476]" },
   ];
 
-  
+  const [activeRides, setActiveRides] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const currentUser = JSON.parse(localStorage.getItem("user"));
   const [showCreateRideForm, setShowCreateRideForm] = useState(false);
+  useEffect(() => {
+    const fetchRides = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/ride/all");
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
+        const rides = await response.json();
+
+        // ✅ Filter rides created by this driver (current user) and status = Open
+        const userRides = rides.filter(
+          (ride) => ride.driver === currentUser.email && ride.status === "Open"
+        );
+
+        setActiveRides(userRides);
+      } catch (err) {
+        console.error("Error fetching rides:", err);
+        setError("Failed to fetch rides");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRides();
+  }, [currentUser.email]);
   const handleNewRideSubmit = (newRide) => {
     const nextId = activeRides.length + 1;
     setActiveRides([...activeRides, { id: nextId, name: `${newRide.startLocation} to ${newRide.destination}`, ...newRide }]);
@@ -46,32 +74,32 @@ const Driver = () => {
   ];
   
   // --- NEW MOCK DATA FOR ACTIVE RIDES ---
-  const activeRides = [
-    { 
-      id: 1, 
-      name: "Mohali to Chandigarh", 
-      pickup: "Sector 5, Mohali", 
-      destination: "Sector 17, Chandigarh", 
-      status: "Open", 
-      price: 150 
-    },
-    { 
-      id: 2, 
-      name: "Pune to Mumbai", 
-      pickup: "Shivaji Nagar, Pune", 
-      destination: "Vashi, Mumbai", 
-      status: "Open", 
-      price: 400 
-    },
-    { 
-      id: 3, 
-      name: "Gurgaon to Jaipur", 
-      pickup: "Old Delhi Road, Gurgaon", 
-      destination: "Jaipur City", 
-      status: "Closed", 
-      price: 600 
-    },
-  ];
+  // const activeRides = [
+  //   { 
+  //     id: 1, 
+  //     name: "Mohali to Chandigarh", 
+  //     pickup: "Sector 5, Mohali", 
+  //     destination: "Sector 17, Chandigarh", 
+  //     status: "Open", 
+  //     price: 150 
+  //   },
+  //   { 
+  //     id: 2, 
+  //     name: "Pune to Mumbai", 
+  //     pickup: "Shivaji Nagar, Pune", 
+  //     destination: "Vashi, Mumbai", 
+  //     status: "Open", 
+  //     price: 400 
+  //   },
+  //   { 
+  //     id: 3, 
+  //     name: "Gurgaon to Jaipur", 
+  //     pickup: "Old Delhi Road, Gurgaon", 
+  //     destination: "Jaipur City", 
+  //     status: "Closed", 
+  //     price: 600 
+  //   },
+  // ];
 
   // Hero Section Style (Same background as the main homepage)
   const heroStyle = { 
@@ -127,25 +155,57 @@ const Driver = () => {
             
             {/* --- MODIFIED SECTION: ACTIVE RIDES --- */}
             <div className="md:col-span-2">
-              <div className="flex justify-between items-center mb-6 border-b border-[#bd9476] pb-2">
-                <h3 className={`text-2xl font-bold text-[#4f3d2a]`}>
-                  My Active Rides
-                </h3>
-                <button onClick={() => setShowCreateRideForm(true)} className="flex items-center bg-[#4f3d2a] text-white px-4 py-2 rounded-lg shadow-md hover:bg-black transition duration-200">
-                  <PlusCircle className="w-5 h-5 mr-2" />
-                  Create New Ride
-                </button>
-              </div>
+      <div className="flex justify-between items-center mb-6 border-b border-[#bd9476] pb-2">
+        <h3 className="text-2xl font-bold text-[#4f3d2a]">My Active Rides</h3>
+        <button
+          onClick={() => setShowCreateRideForm(true)}
+          className="flex items-center bg-[#4f3d2a] text-white px-4 py-2 rounded-lg shadow-md hover:bg-black transition duration-200"
+        >
+          <PlusCircle className="w-5 h-5 mr-2" />
+          Create New Ride
+        </button>
+      </div>
 
-              <div className="space-y-4">
-                  {showCreateRideForm && (
-                  <CreateRideForm
-                    onClose={() => setShowCreateRideForm(false)}
-                    onSubmit={handleNewRideSubmit}
-                  />
-                )}
+      {showCreateRideForm && (
+        <div className="mb-4">
+          <CreateRideForm
+            onClose={() => setShowCreateRideForm(false)}
+            onSubmit={handleNewRideSubmit}
+          />
+        </div>
+      )}
+
+      <div className="space-y-4">
+        {activeRides.length === 0 ? (
+          <p>No active rides found.</p>
+        ) : (
+          activeRides.map((ride) => (
+            <div
+              key={ride._id}
+              className="p-4 border border-gray-300 rounded-lg shadow-sm"
+            >
+              <h4 className="font-semibold text-lg">
+                {ride.startLocation} → {ride.destination}
+              </h4>
+              <p>Date: {new Date(ride.rideDate).toLocaleDateString()}</p>
+              <p>Time: {ride.rideTime}</p>
+              <p>Status: {ride.status}</p>
+
+              <div className="mt-2">
+                <p className="font-medium">Stops:</p>
+                <ul className="list-disc list-inside">
+                  {ride.stops.map((stop, index) => (
+                    <li key={index}>
+                      {stop.stopName} — ₹{stop.pricePerKg}/kg
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
+          ))
+        )}
+      </div>
+    </div>
             
             {/* Recent Activity Feed (Unchanged) */}
             <div className="md:col-span-1">
