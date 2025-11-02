@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import farmerRoutes from "./routes/farmerRoutes.js"
 import cropRoutes from "./routes/cropRoutes.js";
+import driverRoutes from "./routes/driverRoutes.js";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api/customer", userRoutes);
 app.use("/api/farmer", farmerRoutes);
 app.use("/api/crops", cropRoutes);
+app.use("/api/driver", driverRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
