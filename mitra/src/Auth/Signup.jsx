@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Leaf, Tractor, ShoppingBag, Mail, Truck, Lock, User, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 /* Generic InputField */
 const InputField = ({
   label,
@@ -33,6 +33,7 @@ const InputField = ({
 );
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [userType, setUserType] = useState('customer'); // 'farmer' | 'customer' | 'driver'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -110,6 +111,7 @@ const Signup = () => {
       console.error('Signup Error:', error);
       setMessage('Something went wrong. Please try again later.');
     } finally {
+      navigate('/login');
       setLoading(false);
     }
   };

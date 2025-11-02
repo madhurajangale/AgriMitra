@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import CropData from '../../CropData';
 import { DELIVERY_LOCATIONS, PRODUCT_DESCRIPTIONS } from '../../Farmerdata';
-
+import { Link } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 const ProductDetailsPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const product = CropData.find(p => p.id === Number(id));
 
   const [selectedLocation, setSelectedLocation] = useState('Select Location');
@@ -70,7 +72,18 @@ const total = (marketPrice + deliveryCharge) * quantity;
       alert("Please select a delivery location and a farmer first!");
       return;
     }
+    navigate("/order",{
+      state: {
+      productName: product.name,
+      
+      // quantity: quantity,
+      // marketPrice: selectedFarmer.market_price,
+      // deliveryCharge: selectedFarmer.delivery_charge,
+      total: total
+    }
+    });
     alert(`Added ${quantity} units of ${product.name} (from ${selectedFarmer.name}) to cart! Total cost: ₹${total.toFixed(2)}`);
+    <Link to="/order"></Link>
   };
 
     return (
@@ -232,7 +245,7 @@ const total = (marketPrice + deliveryCharge) * quantity;
                                         className="w-32 h-10 py-4 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition duration-150 shadow-xl flex items-center justify-center"
                                     >
                                         <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-                                        Add to Cart
+                                        Order
                                     </button>
                                 </div>
                             )}
