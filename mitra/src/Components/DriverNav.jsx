@@ -40,7 +40,7 @@ const DriverNav = () => {
             </Link>
 
             <Link to="/driver/chat" className="flex items-center hover:text-[#bd9476] transition duration-150">
-              <MessageSquare className="w-5 h-5 mr-1" /> Community Chat
+              <MessageSquare className="w-5 h-5 mr-1" /> Deliveries
             </Link>
 
             {email ? (
