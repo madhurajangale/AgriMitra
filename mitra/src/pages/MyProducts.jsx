@@ -32,33 +32,35 @@ const StockList = ({ stock = [], onViewDetails }) => (
         <p className="text-xl font-medium text-gray-600">Your stock is currently empty. Start adding products! 🛒</p>
       </div>
     ) : (
-      stock.map((product) => (
-        <div
-          key={product._id || product.id}
-          onClick={() => onViewDetails(product)}
-          className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-[#fefaf7] cursor-pointer transition duration-200"
-        >
-          <div className="flex items-center space-x-4">
-            <img
-              src={product.image || '/placeholder.jpg'}
-              alt={product.name || 'Crop'}
-              className="w-12 h-12 object-cover rounded-md border border-gray-100"
-            />
-            <div>
-              <p className="font-bold text-[#3b2f1e] capitalize">{product.name || 'Unnamed Crop'}</p>
+      stock.map((product) => {
+        const qty = Number(product.quantity ?? 0);
+        const unitPrice = Number(product.market_price ?? product.price ?? product.marketPrice ?? 0);
+        const delivery = Number(product.delivery_charge ?? product.deliveryCost ?? 0);
+        const totalPrice = qty * unitPrice + delivery;
+
+        return (
+          <div
+            key={product._id || product.id}
+            onClick={() => onViewDetails(product)}
+            className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-[#fefaf7] cursor-pointer transition duration-200"
+          >
+            <div className="flex items-center space-x-4">
+              
+              <div>
+                <p className="font-bold text-[#3b2f1e] capitalize">{product.name || 'Unnamed Crop'}</p>
+                <p className="text-sm text-gray-500">
+                  {qty} {product.unit || 'units'} • ₹{unitPrice.toFixed(2)} / {product.unit || 'unit'}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <p className="text-lg font-semibold text-green-700">₹{totalPrice.toFixed(2)}</p>
+              <p className="text-sm text-gray-600">Delivery: ₹{delivery.toFixed(2)}</p>
             </div>
           </div>
-
-          <div className="text-right">
-            <p className="text-lg font-semibold text-green-700">
-              {product.quantity || 0} {product.unit || 'units'}
-            </p>
-            <p className="text-sm text-gray-600">
-              ₹{((product.market_price ?? product.price ?? 0)).toFixed(2)} / {product.unit || 'unit'}
-            </p>
-          </div>
-        </div>
-      ))
+        );
+      })
     )}
   </div>
 );
@@ -135,6 +137,8 @@ const AddProductForm = ({ onAddProduct }) => {
       return;
     }
 
+    
+
     const newProduct = {
       name: formData.name,
       farmer: email,
@@ -142,7 +146,7 @@ const AddProductForm = ({ onAddProduct }) => {
       unit: formData.unit,
       market_price: formData.price,
       delivery_charge: formData.deliveryCost,
-      image: CropData.find((c) => c.name === formData.name)?.image || 'https://via.placeholder.com/150?text=New+Crop',
+     
       category: CropData.find((c) => c.name === formData.name)?.category || 'Unknown',
     };
 
@@ -269,7 +273,7 @@ const ProductDetailsView = ({ product, onEdit, onBack }) => {
       <div className="lg:grid lg:grid-cols-2 lg:gap-10">
         <div>
           <div className="rounded-lg overflow-hidden shadow-xl mb-6">
-            <img src={editData.image || 'https://via.placeholder.com/400'} alt={editData.name} className="w-full h-64 object-cover" />
+            
           </div>
           <h1 className="text-3xl font-bold text-[#4f3d2a] mb-2">{editData.name}</h1>
           <p className="text-xl font-extrabold text-green-700 mb-4">₹{displayPrice.toFixed(2)} <span className="text-lg font-normal text-gray-500">/{editData.unit}</span></p>
@@ -307,7 +311,6 @@ const ProductDetailsView = ({ product, onEdit, onBack }) => {
   );
 };
 
-/* Main Page */
 const MyProductsPage = () => {
   const [activeView, setActiveView] = useState('stock');
   const [stockData, setStockData] = useState([]);
