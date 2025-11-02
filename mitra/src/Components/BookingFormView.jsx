@@ -110,7 +110,7 @@ const BookingFormView = ({ selectedRide, onBookRide, isPlacingOrder }) => {
       </div>
 
      
-
+<label className="block text-sm font-medium text-gray-700 mb-1">Enter Pickup Details</label>
       {/* Location Dropdowns */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         {/* State */}
@@ -206,23 +206,103 @@ const BookingFormView = ({ selectedRide, onBookRide, isPlacingOrder }) => {
         </div>
       </div>
 
-      {/* Address */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
-        <div className="relative">
-          <MapPin className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      <label className="block text-sm font-medium text-gray-700 mb-1">Enter Destination Details</label>
+      {/* Location Dropdowns */}
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* State */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+          <select
+            value={selectedState}
+            onChange={handleStateChange}
+            required
+            className="w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+          >
+            <option value="">Select State</option>
+            {Object.keys(locationData).map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* District */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
+          <select
+            value={selectedDistrict}
+            onChange={handleDistrictChange}
+            disabled={!selectedState}
+            required
+            className="w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#bd9476] disabled:bg-gray-100"
+          >
+            <option value="">Select District</option>
+            {selectedState &&
+              Object.keys(locationData[selectedState]).map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        {/* City */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+          <select
+            value={selectedCity}
+            onChange={handleCityChange}
+            disabled={!selectedDistrict}
+            required
+            className="w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#bd9476] disabled:bg-gray-100"
+          >
+            <option value="">Select City</option>
+            {selectedDistrict &&
+              Object.keys(locationData[selectedState][selectedDistrict]).map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        {/* Area */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
+          <select
+            value={selectedArea}
+            onChange={handleAreaChange}
+            disabled={!selectedCity}
+            required
+            className="w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#bd9476] disabled:bg-gray-100"
+          >
+            <option value="">Select Area</option>
+            {selectedCity &&
+              locationData[selectedState][selectedDistrict][selectedCity].map((area) => (
+                <option key={area} value={area}>
+                  {area}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        {/* Pincode */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
           <input
-            type="text"
-            name="address"
-            value={formData.address}
+            type="number"
+            name="pincode"
+            value={formData.pincode}
             onChange={handleChange}
             required
-            className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
-            placeholder="House no., street name..."
+            className="w-full px-3 py-3 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+            placeholder="Enter Pincode"
           />
         </div>
       </div>
 
+      
       {/* Price */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">Est. Price</label>
