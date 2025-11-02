@@ -1,6 +1,23 @@
-import React from 'react';
+import React, { useState } from "react";
 import ReactDOM from 'react-dom/client';
-import { Leaf, Truck, Users, Clock, History, Send, MessageSquare,ArrowRight, LogOut, Package, TrendingUp } from 'lucide-react';
+import CreateRideForm from "../Components/CreateRideForm";
+import { 
+  Leaf, 
+  Truck, 
+  Users, 
+  Clock, 
+  History, 
+  Send, 
+  MessageSquare, 
+  ArrowRight, 
+  LogOut, 
+  Package, 
+  TrendingUp,
+  MapPin,
+  PlusCircle, // Added for the new button
+  CheckCircle, // Added for 'Open' status
+  XCircle // Added for 'Closed' status
+} from 'lucide-react';
 
 // Main DriverPortal Component
 const Driver = () => {
@@ -13,16 +30,48 @@ const Driver = () => {
     { title: "Earnings (This Month)", value: "₹45,200", icon: TrendingUp, color: "text-[#bd9476]" },
   ];
 
+  
+  const [showCreateRideForm, setShowCreateRideForm] = useState(false);
+
+  const handleNewRideSubmit = (newRide) => {
+    const nextId = activeRides.length + 1;
+    setActiveRides([...activeRides, { id: nextId, name: `${newRide.startLocation} to ${newRide.destination}`, ...newRide }]);
+  };
+
   // Mock data for recent activities
   const recentActivities = [
     { id: 1, type: "New Request", description: "Pickup from Farm 103 (Karnal)", time: "Just now" },
     { id: 2, type: "Delivery Complete", description: "Order #459 delivered to Customer C", time: "1 hour ago" },
     { id: 3, type: "Message", description: "Chat reply from Customer A", time: "3 hours ago" },
-    { id: 4, type: "System Update", description: "Route optimization completed for tomorrow.", time: "Yesterday" },
   ];
   
-  // Custom Utility for Tailwind arbitrary color application
-  const getColorClass = (hex) => `text-[${hex}]`;
+  // --- NEW MOCK DATA FOR ACTIVE RIDES ---
+  const activeRides = [
+    { 
+      id: 1, 
+      name: "Mohali to Chandigarh", 
+      pickup: "Sector 5, Mohali", 
+      destination: "Sector 17, Chandigarh", 
+      status: "Open", 
+      price: 150 
+    },
+    { 
+      id: 2, 
+      name: "Pune to Mumbai", 
+      pickup: "Shivaji Nagar, Pune", 
+      destination: "Vashi, Mumbai", 
+      status: "Open", 
+      price: 400 
+    },
+    { 
+      id: 3, 
+      name: "Gurgaon to Jaipur", 
+      pickup: "Old Delhi Road, Gurgaon", 
+      destination: "Jaipur City", 
+      status: "Closed", 
+      price: 600 
+    },
+  ];
 
   // Hero Section Style (Same background as the main homepage)
   const heroStyle = { 
@@ -33,8 +82,6 @@ const Driver = () => {
   return (
     <div className="min-h-screen bg-white font-sans antialiased">
       
-      
-
       {/* Hero Section */}
       <section 
         id="hero" 
@@ -78,38 +125,29 @@ const Driver = () => {
           {/* Deliveries & Activity */}
           <div className="grid md:grid-cols-3 gap-8">
             
-            {/* Active Deliveries */}
+            {/* --- MODIFIED SECTION: ACTIVE RIDES --- */}
             <div className="md:col-span-2">
-              <h3 className={`text-2xl font-bold text-[#4f3d2a] mb-6 border-b border-[#bd9476] pb-2`}>
-                Active Deliveries (Next 3)
-              </h3>
+              <div className="flex justify-between items-center mb-6 border-b border-[#bd9476] pb-2">
+                <h3 className={`text-2xl font-bold text-[#4f3d2a]`}>
+                  My Active Rides
+                </h3>
+                <button onClick={() => setShowCreateRideForm(true)} className="flex items-center bg-[#4f3d2a] text-white px-4 py-2 rounded-lg shadow-md hover:bg-black transition duration-200">
+                  <PlusCircle className="w-5 h-5 mr-2" />
+                  Create New Ride
+                </button>
+              </div>
+
               <div className="space-y-4">
-                {/* Mock Delivery Card 1 */}
-                <div className="bg-white p-5 rounded-xl shadow-md border-l-4 border-l-[#bd9476]">
-                    <div className="flex justify-between items-center">
-                        <p className="font-semibold text-lg text-[#4f3d2a]">Order #460 - Farmer B to Customer D</p>
-                        <span className="text-xs font-semibold text-white bg-[#bd9476] px-3 py-1 rounded-full">En route</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">Route: 12 km | Est. Time: 25 min</p>
-                    <button className="mt-3 text-sm text-[#bd9476] hover:text-[#4f3d2a] font-medium flex items-center">
-                        View Map Details <ArrowRight className="w-4 h-4 ml-1" />
-                    </button>
-                </div>
-                {/* Mock Delivery Card 2 */}
-                <div className="bg-white p-5 rounded-xl shadow-md border-l-4 border-l-[#bd9476]">
-                    <div className="flex justify-between items-center">
-                        <p className="font-semibold text-lg text-[#4f3d2a]">Order #461 - Pickup at Mandi A</p>
-                        <span className="text-xs font-semibold text-white bg-gray-400 px-3 py-1 rounded-full">Pending Pickup</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">Location: Main Storage Unit, Sector 4</p>
-                    <button className="mt-3 text-sm text-[#bd9476] hover:text-[#4f3d2a] font-medium flex items-center">
-                        Start Trip <ArrowRight className="w-4 h-4 ml-1" />
-                    </button>
-                </div>
+                  {showCreateRideForm && (
+                  <CreateRideForm
+                    onClose={() => setShowCreateRideForm(false)}
+                    onSubmit={handleNewRideSubmit}
+                  />
+                )}
               </div>
             </div>
             
-            {/* Recent Activity Feed */}
+            {/* Recent Activity Feed (Unchanged) */}
             <div className="md:col-span-1">
               <h3 className={`text-2xl font-bold text-[#4f3d2a] mb-6 border-b border-[#bd9476] pb-2`}>
                 Recent Activity
@@ -146,5 +184,6 @@ const Driver = () => {
 };
 
 export default Driver;
+
 
 
