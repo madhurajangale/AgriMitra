@@ -21,13 +21,18 @@ const INITIAL_DRIVERS = [
 // MOCK USER ID - In a real app, this comes from your authentication system
 const MOCK_USER_ID = 'farmer_user_99'; 
 
-// Function to simulate fetching drivers from your MongoDB API
 const fetchDrivers = async () => {
-  // --- MONGODB API REPLACEMENT POINT 1 ---
-  // Replace this with: await fetch('/api/drivers').then(res => res.json());
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network latency
-  return INITIAL_DRIVERS;
+  try {
+    const res = await fetch("http://localhost:5000/api/driver");
+    if (!res.ok) throw new Error("Failed to fetch drivers");
+    const data = await res.json();
+    return data; // should be an array of drivers
+  } catch (error) {
+    console.error("Error fetching drivers:", error);
+    return [];
+  }
 };
+
 
 // Function to simulate sending a message to your MongoDB API
 const postMessage = async (messagePayload) => {

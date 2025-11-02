@@ -63,3 +63,12 @@ export const getDriver = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+export const getAllDrivers = async (req, res) => {
+  try {
+    const drivers = await Driver.find({}, "name location status email"); // return only useful fields
+    res.status(200).json(drivers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
