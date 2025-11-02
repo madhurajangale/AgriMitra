@@ -2,18 +2,19 @@ import React from "react";
 
 const CropData = [
   // 🌾 GRAINS & CEREALS
-  { id: 1, name: 'Basmati Rice', category: 'Grains', price: 1.25, unit: 'per kg', image: 'https://cpimg.tistatic.com/11014135/b/4/Indian-Basmati-Rice..jpg' },
-  { id: 2, name: 'Wheat Grain', category: 'Grains', price: 0.80, unit: 'per kg', image: 'https://goodineverygrain.ca/wp-content/uploads/2021/06/wheat-berries-bowl.png' },
-  { id: 3, name: 'Jowar (Sorghum)', category: 'Grains', price: 1.10, unit: 'per kg', image: 'https://static.toiimg.com/thumb/msid-66847765,width-1280,height-720,resizemode-4/66847765.jpg' },
-  { id: 4, name: 'Bajra (Pearl Millet)', category: 'Grains', price: 1.05, unit: 'per kg', image: 'https://www.shutterstock.com/image-photo/closeup-pile-dry-bajra-pearl-600nw-2493219333.jpg' },
-  { id: 5, name: 'Maize (Corn)', category: 'Grains', price: 0.95, unit: 'per kg', image: 'https://foodieng.com/wp-content/uploads/2022/05/yellow-maiz.jpg' },
-  { id: 6, name: 'Ragi (Finger Millet)', category: 'Grains', price: 1.20, unit: 'per kg', image: 'https://doctorrekha.com/wp-content/uploads/2023/10/rag.png' },
-  { id: 7, name: 'Barley', category: 'Grains', price: 1.00, unit: 'per kg', image: 'https://cdn.viva.org.uk/wp-content/uploads/2024/10/Barley.webp' },
+
+  { id: 1, name: 'Basmati Rice', category: 'Grains', price: 120, unit: '₹ per kg', image: 'https://cpimg.tistatic.com/11014135/b/4/Indian-Basmati-Rice..jpg' },
+  { id: 2, name: 'Wheat Grain', category: 'Grains', price: 28, unit: '₹ per kg', image: 'https://goodineverygrain.ca/wp-content/uploads/2021/06/wheat-berries-bowl.png' },
+  { id: 3, name: 'Jowar (Sorghum)', category: 'Grains', price: 35, unit: '₹ per kg', image: 'https://static.toiimg.com/thumb/msid-66847765,width-1280,height-720,resizemode-4/66847765.jpg' },
+  { id: 4, name: 'Bajra (Pearl Millet)', category: 'Grains', price: 30, unit: '₹ per kg', image: 'https://www.shutterstock.com/image-photo/closeup-pile-dry-bajra-pearl-600nw-2493219333.jpg' },
+  { id: 5, name: 'Maize (Corn)', category: 'Grains', price: 25, unit: '₹ per kg', image: 'https://foodieng.com/wp-content/uploads/2022/05/yellow-maiz.jpg' },
+  { id: 6, name: 'Ragi (Finger Millet)', category: 'Grains', price: 40, unit: '₹ per kg', image: 'https://doctorrekha.com/wp-content/uploads/2023/10/rag.png' },
+  { id: 7, name: 'Barley', category: 'Grains', price: 32, unit: '₹ per kg', image: 'https://cdn.viva.org.uk/wp-content/uploads/2024/10/Barley.webp' },
 
   // 🌿 VEGETABLES
-  { id: 8, name: 'Tomatoes', category: 'Vegetables', price: 2.30, unit: 'per kg', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJE1nmUxtL9Pro_mAqQD4l-UKsbJjqSPapDg&s' },
-  { id: 9, name: 'Potatoes', category: 'Vegetables', price: 1.25, unit: 'per kg', image: 'https://img.lb.wbmdstatic.com/vim/live/webmd/consumer_assets/site_images/articles/health_tools/healthy_food_mistakes_slideshow/1800ss_thinkstock_rf_wooden_bowl_potatoes_on_table.jpg?resize=750px:*&output-quality=75' },
-  { id: 10, name: 'Onions', category: 'Vegetables', price: 1.60, unit: 'per kg', image: 'https://vegipath.in/wp-content/uploads/2025/02/Main-onion1.jpg' },
+  { id: 8, name: 'Tomato', category: 'Vegetables', price: 25, unit: 'per kg', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJE1nmUxtL9Pro_mAqQD4l-UKsbJjqSPapDg&s' },
+  { id: 9, name: 'Potato', category: 'Vegetables', price: 22, unit: 'per kg', image: 'https://img.lb.wbmdstatic.com/vim/live/webmd/consumer_assets/site_images/articles/health_tools/healthy_food_mistakes_slideshow/1800ss_thinkstock_rf_wooden_bowl_potatoes_on_table.jpg?resize=750px:*&output-quality=75' },
+  { id: 10, name: 'Onion', category: 'Vegetables', price: 1.60, unit: 'per kg', image: 'https://vegipath.in/wp-content/uploads/2025/02/Main-onion1.jpg' },
   { id: 11, name: 'Cauliflower', category: 'Vegetables', price: 2.75, unit: 'per piece', image: 'https://thriftylesley.com/wp-content/uploads/2013/09/cauliflower.jpg' },
   { id: 12, name: 'Brinjal (Eggplant)', category: 'Vegetables', price: 2.20, unit: 'per kg', image: 'https://images.unsplash.com/photo-1560130839-1b39a4c0b8a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },
   { id: 13, name: 'Okra (Lady Finger)', category: 'Vegetables', price: 2.49, unit: 'per kg', image: 'https://images.unsplash.com/photo-1623236772760-3b49c3622cfb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080' },

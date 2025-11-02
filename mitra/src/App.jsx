@@ -2,13 +2,15 @@ import './App.css'
 import './index.css';
 import Home from './pages/Home';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
-import Login from './Auth/login';
+import Login from './Auth/Login';
 import Signup from './Auth/Signup';
 import Navbar from './Components/Navbar';
 import Shop from './pages/Shop';
 import ProductDetailsPage from './pages/ProductDetails';
 import FarmNavbar from './Components/FarmNavbar';
 import MyProducts from './pages/MyProducts';
+import Driver from './pages/Driver';
+import DriverNav from './Components/DriverNav';
 
 function AppContent() {
   const location = useLocation();
@@ -21,7 +23,13 @@ console.log(role)
     <>
       {!hideNavbar && (
         <>
-          {role === "farmer" ? <FarmNavbar /> : <Navbar />}
+          {role === "farmer" ? (
+            <FarmNavbar />
+          ) : role === "driver" ? (
+            <DriverNav />
+          ) : (
+            <Navbar />
+          )}
         </>
       )}
       <Routes>
@@ -31,7 +39,7 @@ console.log(role)
         <Route path='/shop' element={<Shop />} />
         <Route path='/farmproducts' element={<MyProducts />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
-      
+       <Route path='/driver' element={<Driver />} />        
       </Routes>
     </>
   );
