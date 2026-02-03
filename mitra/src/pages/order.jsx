@@ -50,9 +50,17 @@ const AddressForm = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const orderData = location.state || {};
-    const { productName, total } = orderData;
+const orderData = location.state || {};
 
+const {
+  productName,
+  quantity,
+  total,
+  farmerId,
+  farmerName,
+} = orderData;
+
+console.log(productName)
     const [formData, setFormData] = useState({
         name: "",
         roomNo: "",
@@ -78,27 +86,83 @@ const AddressForm = () => {
         setFormData((prev) => ({ ...prev, [id]: value }));
     };
 
+    const buildAddress = () => {
+  const { roomNo, building, streetName, city, pincode } = formData;
+  return `${roomNo}, ${building}, ${streetName}, ${city} - ${pincode}`;
+};
+
     // Handle submit (rest of the logic remains the same)
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setSubmissionStatus(null);
-        alert("Payment page");
+    // const handleSubmit = (e) => {
+    //     e.preventDefault();
+    //     setLoading(true);
+    //     setSubmissionStatus(null);
+    //     alert("Payment page");
 
-        console.log("Form Data Submitted:", formData);
-        console.log("Order Details:", { productName, total });
+    //     console.log("Form Data Submitted:", formData);
+    //     console.log("Order Details:", { productName, total });
 
-        setTimeout(() => {
-            setLoading(false);
-            const isSuccess = Math.random() > 0.1;
-            if (isSuccess) {
-                setSubmissionStatus("success");
-                setFormData({ /* reset */ });
-            } else {
-                setSubmissionStatus("error");
-            }
-        }, 1500);
-    };
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //         const isSuccess = Math.random() > 0.1;
+    //         if (isSuccess) {
+    //             setSubmissionStatus("success");
+    //             setFormData({ /* reset */ });
+    //         } else {
+    //             setSubmissionStatus("error");
+    //         }
+    //     }, 1500);
+    // };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setSubmissionStatus(null);
+
+  try {
+    const response = await fetch("http://localhost:5000/api/order/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        customerName: formData.name,
+        mobileNumber: formData.mobileNumber,
+        address: buildAddress(),
+
+        farmerId,
+        farmerName,
+
+        item: productName,
+        quantity,
+        totalPrice: total,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setSubmissionStatus("success");
+      setFormData({
+        name: "",
+        roomNo: "",
+        building: "",
+        streetName: "",
+        city: "",
+        pincode: "",
+        mobileNumber: "",
+      });
+    } else {
+      setSubmissionStatus("error");
+      console.error(data.message);
+    }
+  } catch (error) {
+    console.error("Order error:", error);
+    setSubmissionStatus("error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     return (
         <div

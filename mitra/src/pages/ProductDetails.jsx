@@ -67,24 +67,45 @@ const deliveryCharge = selectedFarmer ? selectedFarmer.delivery_charge : 0;
 const total = (marketPrice + deliveryCharge) * quantity;
 
 
-  const handleAddToCart = () => {
-    if (!selectedFarmerId) {
-      alert("Please select a delivery location and a farmer first!");
-      return;
-    }
-    navigate("/order",{
-      state: {
-      productName: product.name,
+//   const handleAddToCart = () => {
+//     if (!selectedFarmerId) {
+//       alert("Please select a delivery location and a farmer first!");
+//       return;
+//     }
+//     navigate("/order",{
+//       state: {
+//       productName: product.name,
       
-      // quantity: quantity,
-      // marketPrice: selectedFarmer.market_price,
-      // deliveryCharge: selectedFarmer.delivery_charge,
-      total: total
-    }
-    });
-    alert(`Added ${quantity} units of ${product.name} (from ${selectedFarmer.name}) to cart! Total cost: ₹${total.toFixed(2)}`);
-    <Link to="/order"></Link>
-  };
+//       // quantity: quantity,
+//       // marketPrice: selectedFarmer.market_price,
+//       // deliveryCharge: selectedFarmer.delivery_charge,
+//       total: total
+//     }
+//     });
+//     alert(`Added ${quantity} units of ${product.name} (from ${selectedFarmer.name}) to cart! Total cost: ₹${total.toFixed(2)}`);
+//     <Link to="/order"></Link>
+//   };
+const handleAddToCart = () => {
+  if (!selectedFarmerId) {
+    alert("Please select a farmer first!");
+    return;
+  }
+
+  navigate("/order", {
+    state: {
+      productName: product.name,
+      quantity: quantity,
+      total: total,
+
+      farmerId: selectedFarmer._id,
+      farmerName: selectedFarmer.farmerName,
+
+      marketPrice: selectedFarmer.market_price,
+      deliveryCharge: selectedFarmer.delivery_charge,
+    },
+  });
+};
+
 
     return (
         <div className="min-h-screen bg-[#f7f4f1] font-sans p-4 sm:p-8">
