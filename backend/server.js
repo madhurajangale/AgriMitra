@@ -7,6 +7,9 @@ import farmerRoutes from "./routes/farmerRoutes.js"
 import cropRoutes from "./routes/cropRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
 import rideRoutes from "./routes/rideRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+
+
 dotenv.config();
 
 const app = express();
@@ -18,6 +21,7 @@ app.use("/api/farmer", farmerRoutes);
 app.use("/api/crops", cropRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/ride", rideRoutes);
+app.use("/api/order", orderRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,

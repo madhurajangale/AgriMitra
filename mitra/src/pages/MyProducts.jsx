@@ -201,8 +201,8 @@ const AddProductForm = ({ onAddProduct }) => {
         <InputField label="Quantity in Stock" name="quantity" type="number" value={formData.quantity} onChange={handleChange} min={1} />
         <InputField label="Unit (e.g., lbs, kg, dozen)" name="unit" value={formData.unit} onChange={handleChange} />
 
-        <InputField label="Market Price (Rs)" name="price" type="number" value={formData.price} onChange={handleChange} min={0.01} />
-        <InputField label="Delivery Cost (Rs)" name="deliveryCost" type="number" value={formData.deliveryCost} onChange={handleChange} min={0.0} />
+        <InputField label="Market Price (Rs)" name="price" type="number" value={formData.price} onChange={handleChange} min={1} />
+        <InputField label="Delivery Cost (Rs)" name="deliveryCost" type="number" value={formData.deliveryCost} onChange={handleChange} min={1} />
       </div>
 
       <div className="flex justify-center">
@@ -301,8 +301,8 @@ const ProductDetailsView = ({ product, onEdit, onBack }) => {
             </div>
 
             <div className="flex space-x-4">
-              <DetailInput label="Market Price (₹)" name="market_price" type="number" value={editData.market_price ?? editData.price ?? ''} onChange={handleChange} disabled={!isEditing} min={0.01} />
-              <DetailInput label="Delivery Cost (₹)" name="delivery_charge" type="number" value={editData.delivery_charge ?? editData.deliveryCost ?? 0} onChange={handleChange} disabled={!isEditing} min={0.0} />
+              <DetailInput label="Market Price (₹)" name="market_price" type="number" value={editData.market_price ?? editData.price ?? ''} onChange={handleChange} disabled={!isEditing} min={0} />
+              <DetailInput label="Delivery Cost (₹)" name="delivery_charge" type="number" value={editData.delivery_charge ?? editData.deliveryCost ?? 0} onChange={handleChange} disabled={!isEditing} min={0} />
             </div>
           </div>
         </div>
