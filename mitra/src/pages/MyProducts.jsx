@@ -98,7 +98,7 @@ const AddProductForm = ({ onAddProduct }) => {
         }
       } catch (err) {
         console.error('Error fetching products:', err);
-        setErrorLocal('Something went wrong while fetching products.');
+        setErrorLocal('');
       } finally {
         setLoadingLocal(false);
       }
