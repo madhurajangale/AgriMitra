@@ -46,6 +46,7 @@ const FormInput = ({
 // ----------------------------------------------------------------------
 // AddressForm Component
 // ----------------------------------------------------------------------
+
 const AddressForm = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -56,9 +57,10 @@ const {
   productName,
   quantity,
   total,
-  farmerId,
-  farmerName,
+  farmerName
 } = orderData;
+
+const farmerEmail = localStorage.getItem("email");
 
 console.log(productName)
     const [formData, setFormData] = useState({
@@ -129,8 +131,8 @@ const handleSubmit = async (e) => {
         mobileNumber: formData.mobileNumber,
         address: buildAddress(),
 
-        farmerId,
         farmerName,
+        // farmerName,
 
         item: productName,
         quantity,
