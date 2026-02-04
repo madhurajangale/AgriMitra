@@ -32,6 +32,7 @@ function Navbar() {
             <Link to="/#mission" className="hover:text-[#bd9476] transition duration-150">Our Mission</Link>
             <Link to="/#features" className="hover:text-[#bd9476] transition duration-150">Features</Link>
             <Link to="/shop" className="hover:text-[#bd9476] transition duration-150">Shop</Link>
+            <Link to="/custhistory" className='hover:text-[#bd9476] transition duration-150'>History</Link>
 
             {/* Conditional login/logout */}
             {email ? (
