@@ -2,13 +2,13 @@ import React, { useEffect, useState, useMemo } from "react";
 import BookingFormView from "../Components/BookingFormView";
 import BookingSuccess from "../Components/BookingSuccess";
 import { fetchDrivers, fetchDriverRides } from "../api/deliveryApi";
-
+import { useNavigate } from "react-router-dom";
 const Chat = () => {
   const [allRides, setAllRides] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRide, setSelectedRide] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
+const navigate = useNavigate();
   const colors = {
     primary: "#8B4513",
     border: "#EADDCA",
@@ -123,7 +123,12 @@ const Chat = () => {
                 </div>
 
                 <button
-                  onClick={() => setSelectedRide(ride)}
+                  onClick={() =>
+  navigate("/ride-details", {
+    state: { ride }
+  })
+}
+
                   className="w-full md:w-32 py-3 rounded-lg font-bold text-white transition-all active:scale-95"
                   style={{ backgroundColor: colors.primary }}
                 >
