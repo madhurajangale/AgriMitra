@@ -90,14 +90,25 @@ const handleSubmit = async (e) => {
         {/* Destination */}
         <div className="mb-4">
           <label className="block font-medium text-gray-700 mb-1">Destination</label>
+          <div className="flex gap-2 mb-2 items-center">
           <input
             type="text"
             name="destination"
             value={rideData.destination}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+            className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
           />
+          <input
+                type="number"
+                placeholder="Price/kg"
+                name="destPrice"
+                value={rideData.destPrice}
+                onChange={handleChange}
+                required
+                className="w-28 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+              />
+              </div>
         </div>
 
 
@@ -126,6 +137,21 @@ const handleSubmit = async (e) => {
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
           />
         </div>
+        
+        {/* Capacity */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-1">Capacity</label>
+          <input
+            type="number"
+            name="capacity"
+            value={rideData.capacity}
+            onChange={handleChange}
+            required
+            min="1"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+          />
+        </div>
+        
         
         {/* Intermediate Stops */}
         <div className="mb-4">
