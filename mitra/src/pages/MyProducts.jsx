@@ -72,7 +72,7 @@ const AddProductForm = ({ onAddProduct }) => {
     name: 'Select Crop',
     quantity: 1,
     unit: 'units',
-    price: 0.01,
+    price: 0,
     deliveryCost: 0.0,
   });
 
@@ -118,13 +118,20 @@ const AddProductForm = ({ onAddProduct }) => {
     }));
   };
 
-  const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'number' ? parseFloat(value) : value,
-    }));
-  };
+const handleChange = (e) => {
+  const { name, value, type } = e.target;
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]:
+      type === "number"
+        ? value === ""
+          ? ""
+          : parseInt(value, 10)
+        : value,
+  }));
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -161,7 +168,7 @@ const AddProductForm = ({ onAddProduct }) => {
         alert(`${data.crop?.name || newProduct.name} added successfully!`);
         onAddProduct({ ...newProduct, id: data.crop?._id ?? Date.now() });
         // reset form
-        setFormData((prev) => ({ ...prev, name: 'Select Crop', quantity: 1, price: 0.01, deliveryCost: 0.0 }));
+        setFormData((prev) => ({ ...prev, name: 'Select Crop', quantity: 1, price: 0, deliveryCost: 0}));
       } else {
         alert(data.message || 'Failed to add crop. Try again.');
       }
@@ -234,11 +241,47 @@ const ProductDetailsView = ({ product, onEdit, onBack }) => {
     setEditData((prev) => ({ ...prev, [name]: type === 'number' ? parseFloat(value) : value }));
   };
 
-  const handleSave = () => {
-    onEdit(editData);
-    setIsEditing(false);
-    alert(`${editData.name} updated successfully!`);
-  };
+const handleSave = async () => {
+  try {
+    const email = localStorage.getItem("email");
+
+    if (!email) {
+      alert("Farmer not logged in");
+      return;
+    }
+
+    const response = await fetch(
+      `http://localhost:5000/api/crops/update/${encodeURIComponent(email)}/${encodeURIComponent(editData.name)}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          quantity: editData.quantity,
+          unit: editData.unit,
+          market_price: editData.market_price,
+          delivery_charge: editData.delivery_charge,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      onEdit(data.crop);   // update UI state
+      setIsEditing(false);
+      alert("Crop updated successfully!");
+    } else {
+      alert(data.message || "Failed to update crop");
+    }
+  } catch (error) {
+    console.error("Update crop error:", error);
+    alert("Something went wrong while updating crop");
+  }
+};
+
+
 
   const DetailInput = ({ label, name, type = 'text', value, onChange, disabled, min }) => (
     <div className="w-full">
@@ -301,7 +344,7 @@ const ProductDetailsView = ({ product, onEdit, onBack }) => {
             </div>
 
             <div className="flex space-x-4">
-              <DetailInput label="Market Price (₹)" name="market_price" type="number" value={editData.market_price ?? editData.price ?? ''} onChange={handleChange} disabled={!isEditing} min={0} />
+              <DetailInput label="Market Price (₹)" name="market_price" type="number" value={editData.market_price ?? editData.price ?? 0} onChange={handleChange} disabled={!isEditing} min={0} />
               <DetailInput label="Delivery Cost (₹)" name="delivery_charge" type="number" value={editData.delivery_charge ?? editData.deliveryCost ?? 0} onChange={handleChange} disabled={!isEditing} min={0} />
             </div>
           </div>

@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import Order from "../models/Order.js";
 import Farmer from "../models/Farmer.js";
+import User from "../models/User.js";
 // ---------------------------------------------
 // CREATE ORDER
 // ---------------------------------------------
@@ -137,6 +138,57 @@ router.get("/farmer/by-email/:email", async (req, res) => {
     console.error("Error fetching farmer orders:", error);
     res.status(500).json({
       message: "Failed to fetch orders",
+    });
+  }
+});
+
+
+
+
+
+
+// -------------------------------------------------
+// GET ORDERS BY CUSTOMER EMAIL
+// email → customer name → orders
+// -------------------------------------------------
+router.get("/customer/by-email/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+    console.log("customer email:", email);
+
+    // 1️⃣ Find customer using email
+    const customer = await User.findOne({ email });
+
+    if (!customer) {
+      return res.status(404).json({
+        message: "Customer not found",
+      });
+    }
+
+    const customerName = customer.name;
+
+    // 2️⃣ Find orders using customerName
+    const orders = await Order.find({ customerName })
+      .sort({ createdAt: -1 });
+
+    if (!orders.length) {
+      return res.status(404).json({
+        message: "No orders found for this customer",
+      });
+    }
+
+    // 3️⃣ Send response
+    res.status(200).json({
+      customer: {
+        name: customer.name,
+        email: customer.email,
+      },
+      orders,
+    });
+  } catch (error) {
+    console.error("Error fetching customer orders:", error);
+    res.status(500).json({
+      message: "Failed to fetch customer orders",
     });
   }
 });
