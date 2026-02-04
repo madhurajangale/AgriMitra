@@ -40,7 +40,7 @@ function Navbar() {
             <Link to="/farmproducts" className="hover:text-[#bd9476] transition duration-150">
               My Products
             </Link>
-            <Link to="/shop" className="hover:text-[#bd9476] transition duration-150">
+            <Link to="/orders" className="hover:text-[#bd9476] transition duration-150">
               Orders
             </Link>
 

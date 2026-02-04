@@ -29,11 +29,11 @@ const orderSchema = new mongoose.Schema(
     },
 
     // Farmer details
-    farmerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Farmer",
-      required: true,
-    },
+    // farmerId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Farmer",
+    //   required: true,
+    // },
 
     farmerName: {
       type: String,
