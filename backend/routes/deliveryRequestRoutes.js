@@ -4,6 +4,7 @@ import {
   createDeliveryRequest,
   getAvailableDeliveriesForDriver,
   acceptDeliveryRequest,
+  getRequestsForDriver,
 } from "../controllers/deliveryRequestController.js";
 
 const router = express.Router();
@@ -13,5 +14,6 @@ router.post("/", createDeliveryRequest);
 // Driver
 router.get("/available", getAvailableDeliveriesForDriver);
 router.put("/accept/:requestId", acceptDeliveryRequest);
+router.get("/driver/:driverEmail",getRequestsForDriver);
 
 export default router;

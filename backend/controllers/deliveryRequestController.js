@@ -60,6 +60,34 @@ export const getAvailableDeliveriesForDriver = async (req, res) => {
   }
 };
 
+export const getRequestsForDriver = async (req, res) => {
+  try {
+    const { driverEmail } = req.params;
+
+    const requests = await DeliveryRequest.find({
+      status: "requested",
+    })
+      .populate({
+        path: "rideId",
+        match: { driver: driverEmail }, // only rides assigned to this driver
+      })
+      .populate("orders") // full order info
+      .sort({ createdAt: -1 });
+
+    // remove requests where rideId is null (not this driver)
+    const filtered = requests.filter(r => r.rideId !== null);
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch driver requests",
+    });
+  }
+};
+
+
+
 export const acceptDeliveryRequest = async (req, res) => {
   try {
     const { requestId } = req.params;

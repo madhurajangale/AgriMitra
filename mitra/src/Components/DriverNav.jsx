@@ -31,7 +31,7 @@ const DriverNav = () => {
 
           {/* Driver Navigation */}
           <nav className="flex space-x-6 text-[#68533b] font-medium">
-            <Link to="/driver/requests" className="flex items-center hover:text-[#bd9476] transition duration-150">
+            <Link to="/delivery-requests" className="flex items-center hover:text-[#bd9476] transition duration-150">
               <Send className="w-5 h-5 mr-1" /> Requests
             </Link>
 
