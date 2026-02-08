@@ -17,6 +17,7 @@ import AddressForm from './pages/order';
 import FarmerOrders from './pages/FarmerOrders';
 import CustomerOrders from './pages/CustHistory';
 import Ridebooking from './pages/Ridebooking';
+import DriverHistory from './pages/DriverHistory';
 function AppContent() {
   const location = useLocation();
   const hideNavbar = location.pathname === '/login' || location.pathname === '/signup';
@@ -51,6 +52,7 @@ console.log(role)
        <Route path='/orders' element={<FarmerOrders />} />
        <Route path='/custhistory' element={<CustomerOrders />} />
         <Route path='/ride-details' element={<Ridebooking />} />
+       <Route path='/driverhistory' element={<DriverHistory />} />
       </Routes>
     </>
   );
