@@ -1,5 +1,6 @@
 import Ride from "../models/Ride.js";
 import Order from "../models/Order.js";
+import DeliveryRequest from "../models/DeliveryRequest.js";
 
 export const createRide = async (req, res) => {
   try {
@@ -47,25 +48,44 @@ export const assignOrdersToRide = async (req, res) => {
       });
     }
 
-    // Flatten assignments object to get all order IDs
-    const orderIds = Object.values(assignments).flat();
+    // 1️⃣ Flatten orders with quantity
+    const selectedOrders = Object.values(assignments).flat();
 
-    if (orderIds.length === 0) {
+    if (selectedOrders.length === 0) {
       return res.status(400).json({
         message: "At least one order must be selected",
       });
     }
 
+    // 2️⃣ Calculate total kg
+    const totalKg = selectedOrders.reduce(
+      (sum, o) => sum + Number(o.quantity),
+      0
+    );
+
+    // 3️⃣ Find existing ride
     const ride = await Ride.findById(rideId);
     if (!ride) {
       return res.status(404).json({ message: "Ride not found" });
     }
 
-    // attach orders to ride
-    ride.orders = orderIds;
+    // 4️⃣ Check capacity
+    if (totalKg > ride.capacity) {
+      return res.status(400).json({
+        message: `Capacity exceeded. Available: ${ride.capacity} kg`,
+      });
+    }
+
+    // 5️⃣ Extract order IDs
+    const orderIds = selectedOrders.map(o => o.orderId);
+
+    // 6️⃣ Attach orders & reduce capacity
+    ride.orders.push(...orderIds);
+    ride.capacity -= totalKg;
+
     await ride.save();
 
-    // update orders
+    // 7️⃣ Update orders
     await Order.updateMany(
       { _id: { $in: orderIds } },
       {
@@ -76,14 +96,128 @@ export const assignOrdersToRide = async (req, res) => {
 
     res.status(200).json({
       message: "Orders assigned to ride successfully",
+      remainingCapacity: ride.capacity,
+      destPrice: ride.destPrice,
     });
+
   } catch (error) {
-    console.error(error);
+    console.error("Assign orders error:", error);
     res.status(500).json({
       message: "Error assigning orders",
-      error,
+      error: error.message,
     });
   }
 };
 
 
+
+export const requestAssignOrders = async (req, res) => {
+  try {
+    const { rideId, orders, farmerEmail, farmerName } = req.body;
+
+    if (!rideId || !orders?.length || !farmerEmail || !farmerName) {
+      return res.status(400).json({
+        message: "Missing required fields",
+      });
+    }
+
+    // create delivery request
+    const deliveryRequest = new DeliveryRequest({
+      rideId,
+      farmerEmail,
+      farmerName,
+      orders,
+      status: "requested",
+    });
+
+    await deliveryRequest.save();
+
+    res.status(201).json({
+      message: "Delivery request sent to driver",
+      deliveryRequest,
+    });
+  } catch (error) {
+    console.error("Request assign error:", error);
+    res.status(500).json({
+      message: "Failed to create delivery request",
+    });
+  }
+};
+
+export const acceptAssignOrders = async (req, res) => {
+  try {
+    const { requestId } = req.body;
+
+    const request = await DeliveryRequest.findById(requestId).populate("orders");
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    const ride = await Ride.findById(request.rideId);
+    if (!ride) {
+      return res.status(404).json({ message: "Ride not found" });
+    }
+
+    // calculate total kg from orders
+    const totalKg = request.orders.reduce(
+      (sum, o) => sum + o.quantity,
+      0
+    );
+
+    if (totalKg > ride.capacity) {
+      return res.status(400).json({
+        message: `Capacity exceeded. Available ${ride.capacity} kg`,
+      });
+    }
+
+    // attach orders
+    ride.orders.push(...request.orders.map(o => o._id));
+    ride.capacity -= totalKg;
+
+    if (ride.capacity === 0) ride.status = "Closed";
+
+    await ride.save();
+
+    // update orders
+    await Order.updateMany(
+      { _id: { $in: request.orders.map(o => o._id) } },
+      {
+        rideId: ride._id,
+        status: "confirmed",
+      }
+    );
+
+    // update request
+    request.status = "accepted";
+    request.driverEmail = ride.driver;
+    await request.save();
+
+    res.status(200).json({
+      message: "Delivery request accepted",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const rejectAssignOrders = async (req, res) => {
+  try {
+    const { orderIds } = req.body;
+
+    await Order.updateMany(
+      { _id: { $in: orderIds } },
+      {
+        assignmentStatus: "rejected",
+        requestedRideId: null,
+      }
+    );
+
+    res.status(200).json({
+      message: "Assignment rejected",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
