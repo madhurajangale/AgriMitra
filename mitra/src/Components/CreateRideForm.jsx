@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { PlusCircle, Trash2 } from "lucide-react";
 
 const CreateRideForm = ({ onClose, onSubmit }) => {
+  const email = localStorage.getItem("email");
   const [rideData, setRideData] = useState({
+    driver:email,
     startLocation: "",
     destination: "",
+    rideDate: "",
+    rideTime: "",
     stops: [{ stopName: "", pricePerKg: "" }], // at least one intermediate stop
     status: "Open",
   });
@@ -34,11 +38,33 @@ const CreateRideForm = ({ onClose, onSubmit }) => {
   };
 
   // Submit form
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(rideData);
-    onClose();
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/api/ride/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(rideData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("✅ Ride created successfully!");
+      if (onSubmit) onSubmit(data); // optional callback
+      onClose();
+    } else {
+      alert(`❌ Failed to create ride: ${data.message || "Unknown error"}`);
+    }
+  } catch (error) {
+    console.error("Error creating ride:", error);
+    alert("⚠️ Something went wrong. Please try again later.");
+  }
+};
+
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -64,16 +90,69 @@ const CreateRideForm = ({ onClose, onSubmit }) => {
         {/* Destination */}
         <div className="mb-4">
           <label className="block font-medium text-gray-700 mb-1">Destination</label>
+          <div className="flex gap-2 mb-2 items-center">
           <input
             type="text"
             name="destination"
             value={rideData.destination}
             onChange={handleChange}
             required
+            className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+          />
+          <input
+                type="number"
+                placeholder="Price/kg"
+                name="destPrice"
+                value={rideData.destPrice}
+                onChange={handleChange}
+                required
+                className="w-28 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+              />
+              </div>
+        </div>
+
+
+        {/* Ride Date */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-1">Ride Date</label>
+          <input
+            type="date"
+            name="rideDate"
+            value={rideData.rideDate}
+            onChange={handleChange}
+            required
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
           />
         </div>
 
+        {/* Ride Time */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-1">Ride Time</label>
+          <input
+            type="time"
+            name="rideTime"
+            value={rideData.rideTime}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+          />
+        </div>
+        
+        {/* Capacity */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-1">Capacity</label>
+          <input
+            type="number"
+            name="capacity"
+            value={rideData.capacity}
+            onChange={handleChange}
+            required
+            min="1"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#bd9476]"
+          />
+        </div>
+        
+        
         {/* Intermediate Stops */}
         <div className="mb-4">
           <label className="block font-medium text-gray-700 mb-2">Intermediate Stops</label>
