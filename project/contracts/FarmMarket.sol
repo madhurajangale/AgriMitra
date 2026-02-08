@@ -31,3 +31,6 @@ contract FarmerMarket {
         return products.length;
     }
 }
+await instance.addProduct("Mango", 100, 5, { from: accounts[0] })
+await instance.buyProduct(0, { from: accounts[1], value: web3.utils.toWei("0.01", "ether") })
+let instance = await artifacts.require("FarmMarket").deployed()

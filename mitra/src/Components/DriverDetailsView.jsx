@@ -45,7 +45,9 @@ const DriverDetailsView = ({ driver, rides, isLoadingRides, onSelectRide }) => (
                 disabled={ride.status === 'Full'}
                 onClick={() => onSelectRide(ride)}
                 className={`w-full sm:w-auto mt-3 py-2 px-5 text-white text-sm font-medium rounded-lg transition duration-200 shadow-md ${
-                  ride.status === 'Full' ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#bd9476] hover:bg-[#4f3d2a]'
+                  ride.status === 'Full'
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-[#bd9476] hover:bg-[#4f3d2a]'
                 }`}
               >
                 Select
