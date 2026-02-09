@@ -13,53 +13,56 @@ const stopSchema = new mongoose.Schema({
 
 const rideSchema = new mongoose.Schema(
   {
-    driver:{
+    driver: {
       type: String,
       required: true,
     },
     startLocation: {
       type: String,
       required: true,
-      trim: true,
     },
     destination: {
       type: String,
       required: true,
-      trim: true,
     },
     destPrice: {
       type: Number,
       required: true,
     },
     stops: {
-      type: [stopSchema], // array of stops
-      validate: (v) => Array.isArray(v) && v.length > 0,
+      type: [stopSchema],
+      required: true,
     },
     rideDate: {
       type: Date,
-      required: true, // you can make it optional if not mandatory
+      required: true,
     },
     rideTime: {
       type: String,
       required: true,
-      trim: true,
-      match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, // optional regex validation for HH:mm format
+    },
+    capacity: {
+      type: Number, // remaining capacity in KG
+      required: true,
     },
     status: {
       type: String,
       enum: ["Open", "Closed"],
       default: "Open",
     },
-    capacity: {
-      type: Number,
-      required: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+
+    // 🔥 Orders added ONLY after driver accepts
+    orders: [
+      {
+        orderId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Order",
+        },
+        quantity: Number,
+      },
+    ],
   },
-  { versionKey: false }
+  { timestamps: true }
 );
 
 export default mongoose.model("Ride", rideSchema);

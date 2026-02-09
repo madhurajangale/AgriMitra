@@ -72,3 +72,20 @@ export const getAllDrivers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getPendingRequests = async (req, res) => {
+  try {
+    const { rideId } = req.params;
+
+    const orders = await Order.find({
+      requestedRideId: rideId,
+      assignmentStatus: "requested",
+    });
+
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
