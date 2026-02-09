@@ -1,12 +1,12 @@
 import Order from "../models/Order.js";
 import Farmer from "../models/Farmer.js";
 import User from "../models/User.js";
+import { storeOrderOnChain } from "../blockchain/OrderChain.js";
 
 // ---------------------------------------------
 // CREATE ORDER
 // ---------------------------------------------
 export const createOrder = async (req, res) => {
-  console.log("reached");
   try {
     const {
       customerName,
@@ -18,9 +18,7 @@ export const createOrder = async (req, res) => {
       totalPrice,
     } = req.body;
 
-    console.log(req.body);
-
-    // 1️⃣ Validate fields
+    // 1️⃣ Validate
     if (
       !customerName ||
       !mobileNumber ||
@@ -30,22 +28,17 @@ export const createOrder = async (req, res) => {
       !quantity ||
       !totalPrice
     ) {
-      return res.status(400).json({
-        message: "All fields are required",
-      });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    // 2️⃣ Find farmer by name
+    // 2️⃣ Find farmer
     const farmer = await Farmer.findOne({ name: farmerName });
-
     if (!farmer) {
-      return res.status(404).json({
-        message: "Farmer not found",
-      });
+      return res.status(404).json({ message: "Farmer not found" });
     }
 
-    // 3️⃣ Create order
-    const newOrder = new Order({
+    // 3️⃣ Save order in DB first
+    const order = new Order({
       customerName,
       mobileNumber,
       address,
@@ -53,23 +46,49 @@ export const createOrder = async (req, res) => {
       farmerName: farmer.name,
       item,
       quantity,
-      totalPrice,
+      totalPrice
+      // status: "PLACED",
     });
 
-    // 4️⃣ Save order
-    const savedOrder = await newOrder.save();
+    const savedOrder = await order.save();
 
+    // 4️⃣ Store order on blockchain
+    let txHash = null;
+    try {
+      txHash = await storeOrderOnChain({
+        orderId: savedOrder._id.toString(),
+        customerName,
+        farmerName,
+        item,
+        quantity,
+        totalPrice,
+      });
+
+      savedOrder.txHash = txHash;
+      await savedOrder.save();
+    } catch (chainError) {
+      console.error("Blockchain failed:", chainError);
+      // we DON'T fail the order if blockchain fails
+    }
+
+    // 5️⃣ Final response
     res.status(201).json({
       message: "Order placed successfully",
       order: savedOrder,
+      blockchainTx: txHash,
     });
+
   } catch (error) {
     console.error("Order creation error:", error);
-    res.status(500).json({
-      message: "Failed to place order",
-    });
+    res.status(500).json({ message: "Failed to place order" });
   }
 };
+
+
+// AFTER saving order in DB
+
+
+
 
 // ---------------------------------------------
 // GET ORDERS BY FARMER NAME
