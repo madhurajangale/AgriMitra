@@ -1,15 +1,28 @@
 // controllers/cropController.js
+
+
 import Crop from "../models/Crop.js";
+import { storeProductOnChain } from "../blockchain/ProductChain.js";
 
 // ➕ Add a new crop
 export const addCrop = async (req, res) => {
   try {
-    const { name, farmer, quantity, unit, market_price, delivery_charge } = req.body;
+    const {
+      name,
+      farmer,
+      quantity,
+      unit,
+      market_price,
+      delivery_charge,
+      category = "Unknown",
+    } = req.body;
 
+    // 1️⃣ Validation
     if (!name || !farmer || !quantity || !unit || !market_price || !delivery_charge) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // 2️⃣ Save to MongoDB first
     const crop = new Crop({
       name,
       farmer,
@@ -17,12 +30,36 @@ export const addCrop = async (req, res) => {
       unit,
       market_price,
       delivery_charge,
+      category,
+      status: "ACTIVE", // optional
     });
 
-    await crop.save();
-    res.status(201).json({ message: "Crop added successfully", crop });
+    const savedCrop = await crop.save();
+
+    // 3️⃣ Store immutable proof on blockchain
+    const txHash = await storeProductOnChain({
+      name,
+      farmer,
+      quantity,
+      unit,
+      market_price,
+      delivery_charge,
+      category,
+    });
+
+    // 4️⃣ Update crop with txHash
+    savedCrop.txHash = txHash;
+    await savedCrop.save();
+
+    res.status(201).json({
+      message: "Crop added & verified on blockchain",
+      crop: savedCrop,
+      txHash,
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Add crop error:", error);
+    res.status(500).json({ message: "Failed to add crop" });
   }
 };
 
