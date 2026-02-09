@@ -50,6 +50,7 @@ const deliveryRequestSchema = new mongoose.Schema(
         "in_transit",
         "delivered",
         "cancelled",
+        "rejected",
       ],
       default: "requested",
     },

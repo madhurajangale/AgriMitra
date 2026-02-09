@@ -25,11 +25,7 @@ const DriverDeliveryRequests = () => {
   const acceptRequest = async (req) => {
     try {
       const payload = {
-        rideId: req.rideId._id,
-        orders: req.orders.map((id) => {
-          const order = req.populatedOrders.find((o) => o._id === id);
-          return { orderId: id, quantity: order.quantity };
-        }),
+        requestId: req._id,
       };
       const res = await fetch("http://localhost:5000/api/ride/accept-assign", {
         method: "POST",
@@ -37,24 +33,33 @@ const DriverDeliveryRequests = () => {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) return alert(data.message);
-      alert("Request accepted");
+      if (!res.ok) return alert(data.message || "Failed to accept request");
+      alert("Request accepted successfully!");
       setRequests((prev) => prev.filter((r) => r._id !== req._id));
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err);
+      alert("Error accepting request");
+    }
   };
 
   const rejectRequest = async (req) => {
     try {
+      const payload = {
+        requestId: req._id,
+      };
       const res = await fetch("http://localhost:5000/api/ride/reject-assign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderIds: req.orders }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) return alert(data.message);
+      if (!res.ok) return alert(data.message || "Failed to reject request");
       alert("Request rejected");
       setRequests((prev) => prev.filter((r) => r._id !== req._id));
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err);
+      alert("Error rejecting request");
+    }
   };
 
   if (loading) return <div className="flex justify-center mt-10 text-xs text-slate-500">Loading requests...</div>;
@@ -104,16 +109,20 @@ const DriverDeliveryRequests = () => {
               <div className="px-4 py-3">
                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Package Details</p>
                 <ul className="space-y-2">
-                  {req.orders.map((order) => (
-                    <li key={order._id} className="flex justify-between items-center text-[12px] bg-slate-50/50 p-2 rounded border border-slate-100/50">
-                      <span className="text-slate-700 font-medium tracking-tight">
-                        {order.item}
-                      </span>
-                      <span className="text-slate-500 tabular-nums">
-                        {order.quantity} kg
-                      </span>
-                    </li>
-                  ))}
+                  {req.orders && req.orders.length > 0 ? (
+                    req.orders.map((order) => (
+                      <li key={order._id} className="flex justify-between items-center text-[12px] bg-slate-50/50 p-2 rounded border border-slate-100/50">
+                        <span className="text-slate-700 font-medium tracking-tight">
+                          {order.cropName || order.item || "Order"}
+                        </span>
+                        <span className="text-slate-500 tabular-nums">
+                          {order.quantity} kg
+                        </span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-[12px] text-slate-500 italic">No order details available</li>
+                  )}
                 </ul>
               </div>
 

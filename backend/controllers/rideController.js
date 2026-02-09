@@ -121,9 +121,20 @@ export const requestAssignOrders = async (req, res) => {
       });
     }
 
-    // create delivery request
+    // Fetch ride details to include in delivery request
+    const ride = await Ride.findById(rideId);
+    if (!ride) {
+      return res.status(404).json({
+        message: "Ride not found",
+      });
+    }
+
+    // create delivery request with route details
     const deliveryRequest = new DeliveryRequest({
       rideId,
+      rideFrom: ride.startLocation,
+      rideTo: ride.destination,
+      rideDate: ride.rideDate,
       farmerEmail,
       farmerName,
       orders,
@@ -204,20 +215,42 @@ export const acceptAssignOrders = async (req, res) => {
 
 export const rejectAssignOrders = async (req, res) => {
   try {
-    const { orderIds } = req.body;
+    const { requestId } = req.body;
 
-    await Order.updateMany(
-      { _id: { $in: orderIds } },
-      {
-        assignmentStatus: "rejected",
-        requestedRideId: null,
-      }
-    );
+    console.log("Rejecting request:", requestId);
+
+    // Find the delivery request
+    const request = await DeliveryRequest.findById(requestId);
+    if (!request) {
+      return res.status(404).json({
+        message: "Delivery request not found",
+      });
+    }
+
+    console.log("Found request, orders:", request.orders);
+
+    // Update order statuses to rejected (keep orders in DB, just change status)
+    if (request.orders && request.orders.length > 0) {
+      const updateResult = await Order.updateMany(
+        { _id: { $in: request.orders } },
+        { $set: { status: "rejected" } }
+      );
+      console.log("Order update result:", updateResult);
+    }
+
+    // Update delivery request status to rejected (do NOT delete it)
+    request.status = "rejected";
+    await request.save();
+    
+    console.log("Request status updated to rejected");
 
     res.status(200).json({
-      message: "Assignment rejected",
+      message: "Assignment rejected successfully",
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Reject error:", error);
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
