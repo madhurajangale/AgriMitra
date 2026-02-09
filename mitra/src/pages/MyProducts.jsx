@@ -127,7 +127,7 @@ const handleChange = (e) => {
       type === "number"
         ? value === ""
           ? ""
-          : parseInt(value, 10)
+          : name === 'quantity' ? parseInt(value, 10) : parseFloat(value)
         : value,
   }));
 };
@@ -371,17 +371,25 @@ const MyProductsPage = () => {
       }
       try {
         setLoading(true);
+        setError(''); // Clear any previous errors
         const response = await fetch(`http://localhost:5000/api/crops/get_All?email=${email}`);
         const data = await response.json();
         if (response.ok) {
-          setStockData(data);
+          setStockData(Array.isArray(data) ? data : []);
+          setError('');
+        } else if (response.status === 404 || (data && data.message && data.message.includes('No products'))) {
+          // If no products found, that's OK - just show empty list
+          setStockData([]);
+          setError('');
         } else {
           setStockData([]);
           setError(data.message || 'Failed to fetch products.');
         }
       } catch (err) {
         console.error('Error fetching products:', err);
-        setError('Something went wrong while fetching products.');
+        // Don't set error for network issues with empty products - just show empty state
+        setStockData([]);
+        setError('');
       } finally {
         setLoading(false);
       }
