@@ -17,6 +17,7 @@
     "ethers": "^6.16.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.3"
+    "mongoose": "^8.18.3",
+    "nodemailer": "^8.0.2"
   }
 }

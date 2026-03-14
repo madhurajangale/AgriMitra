@@ -1,6 +1,8 @@
 // controllers/deliveryRequestController.js
 import DeliveryRequest from "../models/DeliveryRequest.js";
 import Order from "../models/Order.js";
+import nodemailer from "nodemailer";
+import User from "../models/User.js";
 export const createDeliveryRequest = async (req, res) => {
   try {
     const {
@@ -143,11 +145,19 @@ export const getAcceptedDeliveriesForDriver = async (req, res) => {
   }
 };
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "madhurajangle2004@gmail.com",
+    pass: "tnos cjcx zmaz nusj",
+  },
+});
+
 export const markDeliveryAsDelivered = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const delivery = await DeliveryRequest.findById(id);
+    const delivery = await DeliveryRequest.findById(id).populate("orders");
 
     if (!delivery) {
       return res.status(404).json({ message: "Delivery not found" });
@@ -157,16 +167,43 @@ export const markDeliveryAsDelivered = async (req, res) => {
     delivery.status = "delivered";
     await delivery.save();
 
-    // update all orders inside this delivery
+    // update orders
     await Order.updateMany(
-      { _id: { $in: delivery.orders } },
+      { _id: { $in: delivery.orders.map(o => o._id) } },
       { $set: { status: "delivered" } }
     );
 
-    res.status(200).json({ message: "Delivery and orders updated" });
+for (const order of delivery.orders) {
+
+  // find user by name
+  const user = await User.findOne({ name: order.customerName });
+
+  if (!user) {
+    console.log("No user found for:", order.customerName);
+    continue;
+  }
+
+  console.log("Sending mail to:", user.email);
+
+  await transporter.sendMail({
+    from: "madhurajangle2004@gmail.com",
+    to: user.email,
+    subject: "Order Delivered 🚚",
+    html: `
+      <h2>Order Delivered</h2>
+      <p>Hello ${order.customerName},</p>
+      <p>Your order for <b>${order.item}</b> has been delivered.</p>
+      <p>Total: ₹${order.totalPrice}</p>
+      <p>Thank you for ordering from our platform! Please rate the product which can help us improve. Feel free to provide your feedback!</p>
+    `
+  });
+
+}
+
+    res.json({ message: "Delivery completed and emails sent" });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to update delivery status" });
+    res.status(500).json({ message: "Failed to update delivery" });
   }
 };
