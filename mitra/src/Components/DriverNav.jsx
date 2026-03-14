@@ -39,7 +39,7 @@ const DriverNav = () => {
               <History className="w-5 h-5 mr-1" /> History
             </Link>
 
-            <Link to="/driver/chat" className="flex items-center hover:text-[#bd9476] transition duration-150">
+            <Link to="/accepted-deliveries" className="flex items-center hover:text-[#bd9476] transition duration-150">
               <MessageSquare className="w-5 h-5 mr-1" /> Deliveries
             </Link>
 

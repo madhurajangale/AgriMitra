@@ -1,6 +1,6 @@
 // controllers/deliveryRequestController.js
 import DeliveryRequest from "../models/DeliveryRequest.js";
-
+import Order from "../models/Order.js";
 export const createDeliveryRequest = async (req, res) => {
   try {
     const {
@@ -113,5 +113,60 @@ export const acceptDeliveryRequest = async (req, res) => {
     res.status(500).json({
       message: "Failed to accept delivery",
     });
+  }
+};
+
+
+export const getAcceptedDeliveriesForDriver = async (req, res) => {
+  try {
+    const { driverEmail } = req.params;
+
+    const deliveries = await DeliveryRequest.find({
+      status: "accepted",
+    })
+      .populate({
+        path: "rideId",
+        match: { driver: driverEmail }, // only rides of this driver
+      })
+      .populate("orders")
+      .sort({ createdAt: -1 });
+
+    // remove deliveries not belonging to this driver
+    const filtered = deliveries.filter(d => d.rideId !== null);
+
+    res.status(200).json(filtered);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch accepted deliveries",
+    });
+  }
+};
+
+export const markDeliveryAsDelivered = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const delivery = await DeliveryRequest.findById(id);
+
+    if (!delivery) {
+      return res.status(404).json({ message: "Delivery not found" });
+    }
+
+    // update delivery status
+    delivery.status = "delivered";
+    await delivery.save();
+
+    // update all orders inside this delivery
+    await Order.updateMany(
+      { _id: { $in: delivery.orders } },
+      { $set: { status: "delivered" } }
+    );
+
+    res.status(200).json({ message: "Delivery and orders updated" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update delivery status" });
   }
 };
