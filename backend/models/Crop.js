@@ -27,6 +27,16 @@ const cropSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    rating: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    total_rating: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
   },
   {
     timestamps: true,

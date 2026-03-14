@@ -9,7 +9,7 @@ import driverRoutes from "./routes/driverRoutes.js";
 import rideRoutes from "./routes/rideRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import deliveryRequestRoutes from "./routes/deliveryRequestRoutes.js";
-
+import ratingRoutes from "./routes/rateRoute.js";
 
 dotenv.config();
 
@@ -24,6 +24,7 @@ app.use("/api/driver", driverRoutes);
 app.use("/api/ride", rideRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/delivery-requests", deliveryRequestRoutes);
+app.use("/api/rate", ratingRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   // useNewUrlParser: true,

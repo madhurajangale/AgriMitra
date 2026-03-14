@@ -57,9 +57,9 @@ const email = localStorage.getItem("email");
               <h2 className="text-lg font-semibold text-[#4f3d2a]">
                 {order.item}
               </h2>
-              <span className="text-sm font-bold text-orange-600">
+              {/* <span className="text-sm font-bold text-orange-600">
                 {order.status.toUpperCase()}
-              </span>
+              </span> */}
             </div>
 
             <p>Quantity: <b>{order.quantity}</b></p>
