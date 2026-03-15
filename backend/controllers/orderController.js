@@ -1,11 +1,13 @@
+
+
+// ---------------------------------------------
+// CREATE ORDER
+// ---------------------------------------------
 import Order from "../models/Order.js";
 import Farmer from "../models/Farmer.js";
 import User from "../models/User.js";
 import { storeOrderOnChain } from "../blockchain/OrderChain.js";
 
-// ---------------------------------------------
-// CREATE ORDER
-// ---------------------------------------------
 export const createOrder = async (req, res) => {
   try {
     const {
@@ -18,7 +20,6 @@ export const createOrder = async (req, res) => {
       totalPrice,
     } = req.body;
 
-    // 1️⃣ Validate
     if (
       !customerName ||
       !mobileNumber ||
@@ -31,13 +32,11 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // 2️⃣ Find farmer
     const farmer = await Farmer.findOne({ name: farmerName });
     if (!farmer) {
       return res.status(404).json({ message: "Farmer not found" });
     }
 
-    // 3️⃣ Save order in DB first
     const order = new Order({
       customerName,
       mobileNumber,
@@ -46,14 +45,15 @@ export const createOrder = async (req, res) => {
       farmerName: farmer.name,
       item,
       quantity,
-      totalPrice
-      // status: "PLACED",
+      totalPrice,
     });
 
     const savedOrder = await order.save();
 
-    // 4️⃣ Store order on blockchain
     let txHash = null;
+    let blockchainStatus = "success";
+    let blockchainError = null;
+
     try {
       txHash = await storeOrderOnChain({
         orderId: savedOrder._id.toString(),
@@ -67,31 +67,26 @@ export const createOrder = async (req, res) => {
       savedOrder.txHash = txHash;
       await savedOrder.save();
     } catch (chainError) {
+      blockchainStatus = "failed";
+      blockchainError = chainError.message;
       console.error("Blockchain failed:", chainError);
-      // we DON'T fail the order if blockchain fails
     }
 
-    // 5️⃣ Final response
-    res.status(201).json({
-      message: "Order placed successfully",
+    return res.status(201).json({
+      message:
+        blockchainStatus === "success"
+          ? "Order placed successfully"
+          : "Order saved in database but failed on blockchain",
       order: savedOrder,
       blockchainTx: txHash,
+      blockchainStatus,
+      blockchainError,
     });
-
   } catch (error) {
     console.error("Order creation error:", error);
-    res.status(500).json({ message: "Failed to place order" });
+    return res.status(500).json({ message: "Failed to place order" });
   }
 };
-
-
-// AFTER saving order in DB
-
-
-
-
-// ---------------------------------------------
-// GET ORDERS BY FARMER NAME
 // ---------------------------------------------
 export const getOrdersByFarmerName = async (req, res) => {
   try {
