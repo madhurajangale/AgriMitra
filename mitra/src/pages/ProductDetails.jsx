@@ -1,69 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import CropData from '../../CropData';
-import { DELIVERY_LOCATIONS, PRODUCT_DESCRIPTIONS } from '../../Farmerdata';
-import { Link } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import CropData from "../../CropData";
+import { PRODUCT_DESCRIPTIONS } from "../../Farmerdata";
+import axios from "axios";
+
 const ProductDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = CropData.find(p => p.id === Number(id));
 
-  const [selectedLocation, setSelectedLocation] = useState('Select Location');
+  const product = CropData.find((p) => p.id === Number(id));
+
   const [farmers, setFarmers] = useState([]);
   const [selectedFarmerId, setSelectedFarmerId] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-const [ratings, setRatings] = useState({});
-  if (!product) {
-    return <div className="text-center text-red-500 text-xl mt-10">Product not found.</div>;
-  }
 
-  const description = PRODUCT_DESCRIPTIONS[product.name] || "A truly fresh product from our fields, full of natural goodness.";
-const fetchRating = async (farmerName, productName) => {
-  try {
-    const response = await fetch(
-      `http://localhost:5000/api/rate/crop/${encodeURIComponent(farmerName)}/${encodeURIComponent(productName)}`
-    );
+  const description = product
+    ? PRODUCT_DESCRIPTIONS[product.name] ||
+      "A truly fresh product from our fields, full of natural goodness."
+    : "";
 
-    const data = await response.json();
-    setRatings(data[0].rating)
-    console.log(ratings)
-   console.log(data)
-    if (response.ok) {
-      setRatings(data[0].rating)
-    }
-    else{
-        console.log("error")
-    }
-   console.log(ratings)
-  } catch (error) {
-    console.error("Error fetching rating:", error);
-  }
-};
-  // 🔹 Fetch farmers from backend whenever location changes
   useEffect(() => {
-    console.log("first")
     const fetchFarmers = async () => {
-      if (selectedLocation === 'Select Location') {
-        setFarmers([]);
-        return;
-      }
+      if (!product) return;
 
       setLoading(true);
       setError("");
-      try {
-        console.log("second")
-        const response = await fetch(
-          `http://localhost:5000/api/farmer/get_all?location=${selectedLocation}&name=${product.name}`
-        );
 
-        const data = await response.json();
-        console.log(data)
-        
-        if (response.ok) {
+      try {
+       const response = await axios.get("http://localhost:5000/api/farmer/get_all", {
+  params: { name: product.name }
+});
+
+        const data = await response.data;
+        console.log("Farmers fetched:", data);
+
+        if (response.status === 200) {
           setFarmers(data);
+          setSelectedFarmerId(null);
         } else {
           setFarmers([]);
           setError(data.message || "No farmers found.");
@@ -71,235 +46,235 @@ const fetchRating = async (farmerName, productName) => {
       } catch (err) {
         console.error("Error fetching farmers:", err);
         setError("Failed to fetch farmers. Please try again later.");
+        setFarmers([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchFarmers();
-  }, [selectedLocation, product.name]);
+  }, [product]);
 
-const selectedFarmer = farmers.find(f => f._id === selectedFarmerId);
-
-const marketPrice = selectedFarmer ? selectedFarmer.market_price : 0;
-const deliveryCharge = selectedFarmer ? selectedFarmer.delivery_charge : 0;
-
-// Total = (market price + delivery) * quantity
-const total = (marketPrice + deliveryCharge) * quantity;
-
-
-//   const handleAddToCart = () => {
-//     if (!selectedFarmerId) {
-//       alert("Please select a delivery location and a farmer first!");
-//       return;
-//     }
-//     navigate("/order",{
-//       state: {
-//       productName: product.name,
-      
-//       // quantity: quantity,
-//       // marketPrice: selectedFarmer.market_price,
-//       // deliveryCharge: selectedFarmer.delivery_charge,
-//       total: total
-//     }
-//     });
-//     alert(`Added ${quantity} units of ${product.name} (from ${selectedFarmer.name}) to cart! Total cost: ₹${total.toFixed(2)}`);
-//     <Link to="/order"></Link>
-//   };
-const handleAddToCart = () => {
-  if (!selectedFarmerId) {
-    alert("Please select a farmer first!");
-    return;
+  if (!product) {
+    return (
+      <div className="text-center text-red-500 text-xl mt-10">
+        Product not found.
+      </div>
+    );
   }
 
-  navigate("/order", {
-    state: {
-      productName: product.name,
-      quantity: quantity,
-      total: total,
+  const selectedFarmer = farmers.find((f) => f._id === selectedFarmerId);
+  const marketPrice = selectedFarmer ? Number(selectedFarmer.market_price) : 0;
+  const total = marketPrice * quantity;
 
-      farmerId: selectedFarmer._id,
-      farmerName: selectedFarmer.farmerName,
+  const handleAddToCart = () => {
+    if (!selectedFarmer) {
+      alert("Please select a farmer first!");
+      return;
+    }
 
-      marketPrice: selectedFarmer.market_price,
-      deliveryCharge: selectedFarmer.delivery_charge,
-    },
-  });
-};
+    navigate("/order", {
+      state: {
+        productName: product.name,
+        quantity,
+        total,
+        farmerId: selectedFarmer._id,
+        farmerName: selectedFarmer.farmerName,
+        farmerLocation: selectedFarmer.location,
+        marketPrice,
+      },
+    });
+  };
 
+  return (
+    <div className="min-h-screen bg-[#f7f4f1] font-sans p-4 sm:p-8">
+      <div className="max-w-6xl mx-auto">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center text-[#4f3d2a] hover:text-[#bd9476] mb-6 font-semibold transition"
+        >
+          <svg
+            className="w-5 h-5 mr-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Market
+        </button>
 
-    return (
-        <div className="min-h-screen bg-[#f7f4f1] font-sans p-4 sm:p-8">
-            <div className="max-w-6xl mx-auto">
-                
-                {/* Back Button (Placeholder) */}
-                <button 
-                    onClick={() => window.history.back()}
-                    className="flex items-center text-[#4f3d2a] hover:text-[#bd9476] mb-6 font-semibold transition"
-                >
-                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to Market
-                </button>
+        <div className="bg-white rounded-xl shadow-2xl p-6 lg:p-10">
+          <div className="lg:grid lg:grid-cols-2 lg:gap-12">
+            {/* LEFT */}
+            <div>
+              <div className="rounded-lg overflow-hidden shadow-xl mb-6">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-80 object-cover"
+                />
+              </div>
 
-                <div className="bg-white rounded-xl shadow-2xl p-6 lg:p-10">
-                    <div className="lg:grid lg:grid-cols-2 lg:gap-12">
-                        
-                        {/* LEFT COLUMN: Image and Core Info */}
-                        <div>
-                            <div className="rounded-lg overflow-hidden shadow-xl mb-6">
-                                <img 
-                                    src={product.image} 
-                                    alt={product.name} 
-                                    className="w-full h-80 object-cover" 
-                                />
-                            </div>
-                            
-                            <h1 className="text-3xl font-bold text-[#4f3d2a] mb-2">{product.name}</h1>
-                           
-                            
-                            {/* Product Description */}
-                            <div className="mt-6 border-t pt-4">
-                                <h2 className="text-2xl font-semibold text-[#4f3d2a] mb-3">About this Produce</h2>
-                                <p className="text-gray-700 leading-relaxed italic">
-                                    {description}
-                                </p>
-                            </div>
-                        </div>
+              <h1 className="text-3xl font-bold text-[#4f3d2a] mb-2">
+                {product.name}
+              </h1>
 
-                        {/* RIGHT COLUMN: Selection and Order */}
-                        <div className="mt-8 lg:mt-0 lg:border-l lg:pl-12">
-                            <h2 className="text-2xl font-semibold text-[#4f3d2a] mb-6">Order Details</h2>
-
-                            {/* 1. SELECT DELIVERY LOCATION */}
-                            <div className="mb-6">
-                                <label htmlFor="location" className="block text-lg font-medium text-gray-700 mb-2">
-                                    1. Select Delivery Location
-                                </label>
-                                <select
-                                    id="location"
-                                    value={selectedLocation}
-                                    onChange={(e) => {
-                                        setSelectedLocation(e.target.value);
-                                        setSelectedFarmerId(null); // Reset farmer on location change
-                                    }}
-                                    className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-[#bd9476] focus:border-[#bd9476] transition"
-                                >
-                                    {DELIVERY_LOCATIONS.map(loc => (
-                                        <option key={loc} value={loc} disabled={loc === 'Select Location'}>
-                                            {loc}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* 2. SELECT FARMER LIST */}
-                            {selectedLocation !== 'Select Location' && (
-                                <div className="mb-6 border-t pt-4">
-                                    <h3 className="text-lg font-medium text-gray-700 mb-3">
-                                        2. Choose a Farmer in {selectedLocation}
-                                    </h3>
-                                    {farmers.length > 0 ? (
-                                        <div className="space-y-3">
-                                            {farmers.map(farmer => (
-                                                <div 
-                                                    key={farmer._id}
-                                                    onClick={() => setSelectedFarmerId(farmer._id)}  // use _id
-                                                    className={`p-4 border rounded-lg cursor-pointer transition duration-200
-                                                        ${selectedFarmerId === farmer._id 
-                                                            ? 'border-4 border-[#bd9476] bg-[#fdf5ed] shadow-inner' 
-                                                            : 'border-gray-200 hover:bg-gray-50'
-                                                        }`}
-                                                >
-<p className="text-sm font-semibold text-yellow-600">
-  Rating: {farmer.rating ? `⭐ ${farmer.rating.toFixed(1)}` : "No ratings yet"}
-</p>
-                                                    <p className="font-bold text-[#4f3d2a]">Farmer: {farmer.farmerName}</p>
-                                                     <p className="text-sm font-semibold text-green-700">
-                                                        Price:  ₹{farmer.market_price.toFixed(2)}
-                                                    </p>
-                                                    <p className="text-sm font-semibold text-green-700">
-                                                        Delivery: ₹{farmer.delivery_charge.toFixed(2)}
-                                                    </p>
-                                                </div>
-                                            ))}
-
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm text-red-500">No farmers found delivering to {selectedLocation}.</p>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* 3. QUANTITY & CART OPTIONS */}
-                            {selectedFarmerId && (
-                                <div className="mt-8 border-t pt-4">
-                                    <h3 className="text-lg font-medium text-gray-700 mb-4">
-                                        3. Finalize Order
-                                    </h3>
-                                    
-                                    {/* Quantity Picker */}
-                                    <div className="flex items-center justify-between mb-4">
-                                        <label htmlFor="quantity" className="font-semibold text-gray-700">Quantity ({product.unit}):</label>
-                                        <input
-                                            type="number"
-                                            id="quantity"
-                                            min="1"
-                                            value={quantity}
-                                            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                            className="w-20 p-2 border border-gray-300 rounded-lg text-center"
-                                        />
-                                    </div>
-
-<div className="space-y-2 py-4 border-t border-b mb-6">
-  {/* Market Price */}
-  <div className="flex justify-between text-gray-600">
-    <span>Market Price:</span>
-    <span>₹{selectedFarmer?.market_price.toFixed(2) || "0.00"}</span>
-  </div>
-
-  {/* Delivery Charge */}
-  <div className="flex justify-between text-gray-600">
-    <span>Delivery Charge:</span>
-    <span>₹{selectedFarmer?.delivery_charge.toFixed(2) || "0.00"}</span>
-  </div>
-
-  {/* Subtotal per unit */}
-  <div className="flex justify-between text-gray-600">
-    <span>Price per unit (Market + Delivery):</span>
-    <span>₹{(selectedFarmer ? selectedFarmer.market_price + selectedFarmer.delivery_charge : 0).toFixed(2)}</span>
-  </div>
-
-  {/* Quantity */}
-  <div className="flex justify-between text-gray-600">
-    <span>Quantity:</span>
-    <span>{quantity}</span>
-  </div>
-
-  {/* Total */}
-  <div className="flex justify-between text-xl font-bold text-[#4f3d2a]">
-    <span>Total (Market + Delivery × Quantity):</span>
-    <span>₹{((selectedFarmer ? selectedFarmer.market_price + selectedFarmer.delivery_charge : 0) * quantity).toFixed(2)}</span>
-  </div>
-</div>
-
-
-                                    
-                                    {/* Add to Cart Button */}
-                                    <button
-                                        onClick={handleAddToCart}
-                                        className="w-32 h-10 py-4 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition duration-150 shadow-xl flex items-center justify-center"
-                                    >
-                                        <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-                                        Order
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+              <div className="mt-6 border-t pt-4">
+                <h2 className="text-2xl font-semibold text-[#4f3d2a] mb-3">
+                  About this Produce
+                </h2>
+                <p className="text-gray-700 leading-relaxed italic">
+                  {description}
+                </p>
+              </div>
             </div>
+
+            {/* RIGHT */}
+            <div className="mt-8 lg:mt-0 lg:border-l lg:pl-12">
+              <h2 className="text-2xl font-semibold text-[#4f3d2a] mb-6">
+                Order Details
+              </h2>
+
+              <div className="mb-6 border-t pt-4">
+                <h3 className="text-lg font-medium text-gray-700 mb-3">
+                  1. Choose a Farmer
+                </h3>
+
+                {loading && (
+                  <p className="text-sm text-gray-500">Loading farmers...</p>
+                )}
+
+                {error && <p className="text-sm text-red-500">{error}</p>}
+
+                {!loading && farmers.length > 0 ? (
+                  <div className="space-y-3">
+                    {farmers.map((farmer) => (
+                      <div
+                        key={farmer._id}
+                        onClick={() => setSelectedFarmerId(farmer._id)}
+                        className={`p-4 border rounded-lg cursor-pointer transition duration-200 ${
+                          selectedFarmerId === farmer._id
+                            ? "border-4 border-[#bd9476] bg-[#fdf5ed] shadow-inner"
+                            : "border-gray-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        <p className="text-sm font-semibold text-yellow-600">
+                          Rating:{" "}
+                          {farmer.rating
+                            ? `⭐ ${Number(farmer.rating).toFixed(1)}`
+                            : "No ratings yet"}
+                        </p>
+
+                        <p className="font-bold text-[#4f3d2a]">
+                          Farmer: {farmer.farmerName}
+                        </p>
+
+                        <p className="text-sm font-semibold text-blue-700">
+                          Farm Location: {farmer.location || "N/A"}
+                        </p>
+
+                        <p className="text-sm font-semibold text-green-700">
+                          Market Price: ₹
+                          {Number(farmer.market_price || 0).toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  !loading &&
+                  !error && (
+                    <p className="text-sm text-red-500">
+                      No farmers found for this product.
+                    </p>
+                  )
+                )}
+              </div>
+
+              {selectedFarmerId && (
+                <div className="mt-8 border-t pt-4">
+                  <h3 className="text-lg font-medium text-gray-700 mb-4">
+                    2. Finalize Order
+                  </h3>
+
+                  <div className="flex items-center justify-between mb-4">
+                    <label
+                      htmlFor="quantity"
+                      className="font-semibold text-gray-700"
+                    >
+                      Quantity ({product.unit}):
+                    </label>
+                    <input
+                      type="number"
+                      id="quantity"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) =>
+                        setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                      }
+                      className="w-20 p-2 border border-gray-300 rounded-lg text-center"
+                    />
+                  </div>
+
+                  <div className="space-y-2 py-4 border-t border-b mb-6">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Farmer:</span>
+                      <span>{selectedFarmer?.farmerName || "N/A"}</span>
+                    </div>
+
+                    <div className="flex justify-between text-gray-600">
+                      <span>Farmer City:</span>
+                      <span>{selectedFarmer?.location || "N/A"}</span>
+                    </div>
+
+                    <div className="flex justify-between text-gray-600">
+                      <span>Market Price:</span>
+                      <span>₹{marketPrice.toFixed(2)}</span>
+                    </div>
+
+                    <div className="flex justify-between text-gray-600">
+                      <span>Quantity:</span>
+                      <span>{quantity}</span>
+                    </div>
+
+                    <div className="flex justify-between text-xl font-bold text-[#4f3d2a]">
+                      <span>Subtotal:</span>
+                      <span>₹{total.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-32 h-10 py-4 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition duration-150 shadow-xl flex items-center justify-center"
+                  >
+                    <svg
+                      className="w-6 h-6 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    Order
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default ProductDetailsPage;

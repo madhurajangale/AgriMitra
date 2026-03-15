@@ -41,7 +41,18 @@ const Signup = () => {
   const [location, setLocation] = useState(''); // farmer
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const LOCATIONS = [
+  { name: "Mumbai", lat: 19.0760, lng: 72.8777 },
+  { name: "Pune", lat: 18.5204, lng: 73.8567 },
+  { name: "Nashik", lat: 19.9975, lng: 73.7898 },
+  { name: "Nagpur", lat: 21.1458, lng: 79.0882 },
+  { name: "Kolhapur", lat: 16.7050, lng: 74.2433 },
+  { name: "Satara", lat: 17.6805, lng: 74.0183 },
+  { name: "Solapur", lat: 17.6599, lng: 75.9064 },
+  { name: "Aurangabad", lat: 19.8762, lng: 75.3433 },
+  { name: "Ahmednagar", lat: 19.0948, lng: 74.7480 },
+  { name: "Amravati", lat: 20.9374, lng: 77.7796 }
+];
   // driver-specific
   const [address, setAddress] = useState('');
   const [plates, setPlates] = useState(['']); // vehiclePlateNumbers
@@ -167,17 +178,30 @@ const Signup = () => {
             <InputField label="Email Address" id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" Icon={Mail} />
             <InputField label="Password" id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" Icon={Lock} />
 
-            {isFarmer && (
-              <InputField
-                label="Farm Location (City/Region)"
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g., Maharashtra"
-                Icon={MapPin}
-                required={false}
-              />
-            )}
+        {isFarmer && (
+  <div className="mb-4">
+    <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+      Farm Location
+    </label>
+    <div className="relative">
+      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+      <select
+        id="location"
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bd9476] focus:border-[#bd9476] transition"
+        required
+      >
+        <option value="">Select Farm Location</option>
+        {LOCATIONS.map((loc) => (
+          <option key={loc.name} value={loc.name}>
+            {loc.name}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
+)}
 
             {isDriver && (
               <>

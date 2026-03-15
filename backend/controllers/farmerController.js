@@ -45,43 +45,71 @@ export const getFarmer = async (req, res) => {
 
 
 
+// export const getAllFarmers = async (req, res) => {
+//   try {
+//     const { name } = req.query;
+
+//     if ( !name) {
+//       return res.status(400).json({ message: "Crop name is required." });
+//     }
+
+//     // Step 1: Find all farmers from the same location
+//     // const farmers = await Farmer.find({ location });
+//     const farmerMap = {}; // store email → name
+//     const farmerEmails = farmers.map(f => {
+//       farmerMap[f.email] = f.name;
+//       return f.email;
+//     });
+
+//     // Step 2: Find all crops with same name & farmer email in that location
+//     const crops = await Crop.find({
+//       name,
+//       farmer: { $in: farmerEmails },
+//     }).sort({ createdAt: -1 });
+
+//     // Step 3: Attach farmer name to each crop
+//     const cropsWithFarmer = crops.map(crop => ({
+//       ...crop._doc,
+//       farmerName: farmerMap[crop.farmer] || "Unknown Farmer",
+//     }));
+
+//     // Step 4: Send response
+//     if (cropsWithFarmer.length === 0) {
+//       return res.status(404).json({ message: "No crops found in this location." });
+//     }
+
+//     res.status(200).json(cropsWithFarmer);
+//   } catch (error) {
+//     console.error("Error fetching crops:", error);
+//     res.status(500).json({ message: "Server error while fetching crops." });
+//   }
+// };
+
 export const getAllFarmers = async (req, res) => {
   try {
-    const { location, name } = req.query;
+    const { name } = req.query;
 
-    if (!location || !name) {
-      return res.status(400).json({ message: "Location and crop name are required." });
+    if (!name) {
+      return res.status(400).json({ message: "Crop name is required." });
     }
 
-    // Step 1: Find all farmers from the same location
-    const farmers = await Farmer.find({ location });
-    const farmerMap = {}; // store email → name
-    const farmerEmails = farmers.map(f => {
-      farmerMap[f.email] = f.name;
-      return f.email;
+    const cleanedName = name.split("(")[0].trim();
+
+    const farmers = await Farmer.find({
+      crops: {
+        $elemMatch: {
+          name: { $regex: cleanedName, $options: "i" }
+        }
+      }
     });
 
-    // Step 2: Find all crops with same name & farmer email in that location
-    const crops = await Crop.find({
-      name,
-      farmer: { $in: farmerEmails },
-    }).sort({ createdAt: -1 });
-
-    // Step 3: Attach farmer name to each crop
-    const cropsWithFarmer = crops.map(crop => ({
-      ...crop._doc,
-      farmerName: farmerMap[crop.farmer] || "Unknown Farmer",
-    }));
-
-    // Step 4: Send response
-    if (cropsWithFarmer.length === 0) {
-      return res.status(404).json({ message: "No crops found in this location." });
+    if (!farmers.length) {
+      return res.status(404).json({ message: "No farmers found for this crop." });
     }
 
-    res.status(200).json(cropsWithFarmer);
+    res.status(200).json(farmers);
   } catch (error) {
-    console.error("Error fetching crops:", error);
-    res.status(500).json({ message: "Server error while fetching crops." });
+    console.error("Error fetching farmers:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
-
