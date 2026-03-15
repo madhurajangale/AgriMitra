@@ -15,13 +15,33 @@ const ProductDetailsPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+const [ratings, setRatings] = useState({});
   if (!product) {
     return <div className="text-center text-red-500 text-xl mt-10">Product not found.</div>;
   }
 
   const description = PRODUCT_DESCRIPTIONS[product.name] || "A truly fresh product from our fields, full of natural goodness.";
+const fetchRating = async (farmerName, productName) => {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/rate/crop/${encodeURIComponent(farmerName)}/${encodeURIComponent(productName)}`
+    );
 
+    const data = await response.json();
+    setRatings(data[0].rating)
+    console.log(ratings)
+   console.log(data)
+    if (response.ok) {
+      setRatings(data[0].rating)
+    }
+    else{
+        console.log("error")
+    }
+   console.log(ratings)
+  } catch (error) {
+    console.error("Error fetching rating:", error);
+  }
+};
   // 🔹 Fetch farmers from backend whenever location changes
   useEffect(() => {
     console.log("first")
@@ -41,6 +61,7 @@ const ProductDetailsPage = () => {
 
         const data = await response.json();
         console.log(data)
+        
         if (response.ok) {
           setFarmers(data);
         } else {
@@ -189,6 +210,9 @@ const handleAddToCart = () => {
                                                             : 'border-gray-200 hover:bg-gray-50'
                                                         }`}
                                                 >
+<p className="text-sm font-semibold text-yellow-600">
+  Rating: {farmer.rating ? `⭐ ${farmer.rating.toFixed(1)}` : "No ratings yet"}
+</p>
                                                     <p className="font-bold text-[#4f3d2a]">Farmer: {farmer.farmerName}</p>
                                                      <p className="text-sm font-semibold text-green-700">
                                                         Price:  ₹{farmer.market_price.toFixed(2)}

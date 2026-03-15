@@ -5,8 +5,8 @@ const router = express.Router();
 
 // Update rating
 router.put("/crop/:farmer/:name/rating", updateCropRating);
+// routes/ratingRoutes.js
 
-// Get rating
-// router.get("/crop/:farmer/:name/rating", getCropRating);
+router.get("/rate/crop/:farmer/:name", getCropRating);
 
 export default router;

@@ -57,3 +57,35 @@ console.log(farmer)
     res.status(500).json({ error: error.message });
   }
 };
+
+
+export const getCropRating = async (req, res) => {
+  try {
+    const { farmer, name } = req.params;
+
+    // find farmer email
+    const farmerData = await Farmer.findOne({ farmerName: farmer });
+
+    if (!farmerData) {
+      return res.status(404).json({ message: "Farmer not found" });
+    }
+
+    // find crop
+    const crop = await Crop.findOne({
+      Farmer_email: farmerData.email,
+      name: name
+    }).select("rating total_rating");
+
+    if (!crop) {
+      return res.status(404).json({ message: "Crop not found" });
+    }
+
+    res.json({
+      rating: crop.rating,
+      totalUsers: crop.total_rating
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
