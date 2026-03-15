@@ -1,5 +1,5 @@
 import express from "express";
-import { updateCropRating} from "../controllers/ratingController.js";
+import { updateCropRating, getCropRating} from "../controllers/ratingController.js";
 
 const router = express.Router();
 
