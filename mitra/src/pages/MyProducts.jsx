@@ -209,7 +209,7 @@ const handleChange = (e) => {
         <InputField label="Unit (e.g., lbs, kg, dozen)" name="unit" value={formData.unit} onChange={handleChange} />
 
         <InputField label="Market Price (Rs)" name="price" type="number" value={formData.price} onChange={handleChange} min={1} />
-       <InputField label="Base Delivery Price (Rs)" name="deliveryCost" type="number" value={formData.deliveryCost} onChange={handleChange} min={0} />
+       <InputField label="Base Delivery Price (Rs pr-km)" name="deliveryCost" type="number" value={formData.deliveryCost} onChange={handleChange} min={0} />
       </div>
 
       <div className="flex justify-center">

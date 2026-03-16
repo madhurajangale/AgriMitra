@@ -7,7 +7,19 @@ export const FARMER_DATA = [
     { id: 105, name: 'Sun Valley Greens', location: 'Pune', deliveryCost: 6.00, estimatedDelivery: '2 days' },
 ];
 
-export const DELIVERY_LOCATIONS = ['Select Location', 'Mumbai', 'Pune', 'Nashik', 'Bengaluru'];
+export const DELIVERY_LOCATIONS = [
+  "Select Location",
+  "Mumbai",
+  "Pune",
+  "Nashik",
+  "Nagpur",
+  "Aurangabad",
+  "Kolhapur",
+  "Solapur",
+  "Amravati",
+  "Satara",
+  "Sangli"
+];
 
 // Sample description (you'd put this in your main CropData or fetch it)
 export const PRODUCT_DESCRIPTIONS = {

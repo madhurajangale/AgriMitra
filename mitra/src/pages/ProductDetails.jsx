@@ -173,7 +173,7 @@ const handleAddToCart = () => {
                             {/* 1. SELECT DELIVERY LOCATION */}
                             <div className="mb-6">
                                 <label htmlFor="location" className="block text-lg font-medium text-gray-700 mb-2">
-                                    1. Select Delivery Location
+                                    Select location you want to buy from
                                 </label>
                               <select
   id="location"
@@ -192,9 +192,8 @@ const handleAddToCart = () => {
     </option>
   ))}
 </select>
-                            </div>
-
-                            {/* 2. SELECT FARMER LIST */}
+</div>
+{/* 2. SELECT FARMER LIST */}
                             {selectedLocation !== 'Select Location' && (
                                 <div className="mb-6 border-t pt-4">
                                     <h3 className="text-lg font-medium text-gray-700 mb-3">
